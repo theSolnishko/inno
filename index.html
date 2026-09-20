@@ -1,0 +1,1948 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f3ec">
+  <title>Расписание 7а</title>
+  <style>
+    :root {
+      --bg: #f6f3ec;
+      --card: #ffffff;
+      --card-soft: #fbfaf6;
+      --line: #e4ddd0;
+      --text: #1f2937;
+      --muted: #5b6677;
+      --now: #0f766e;
+      --next: #1d4ed8;
+      --lesson: #0369a1;
+      --extra: #b45309;
+      --regime: #6d28d9;
+      --break: #64748b;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, #fff7e8 0%, transparent 36%),
+        radial-gradient(circle at 90% 8%, #e8f3ff 0%, transparent 30%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    .wrap {
+      width: min(720px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 20px 0 48px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 1.55rem;
+      letter-spacing: 0.02em;
+    }
+
+    .sub {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .clocks {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .card {
+      background: color-mix(in srgb, var(--card) 92%, transparent);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px 16px;
+      backdrop-filter: blur(8px);
+    }
+
+    .clock-label {
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .clock-time {
+      margin-top: 4px;
+      font-variant-numeric: tabular-nums;
+      font-size: 1.55rem;
+      font-weight: 700;
+    }
+
+    .clock-date {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .hero {
+      margin-bottom: 12px;
+      border-color: color-mix(in srgb, var(--now) 35%, var(--line));
+    }
+
+    .badge {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .badge-now { background: #d1fae5; color: var(--now); }
+    .badge-phone-yes { background: #dbeafe; color: #1d4ed8; }
+    .badge-phone-no { background: #ffe4e6; color: #be123c; }
+    .badge-next { background: #dbeafe; color: var(--next); }
+    .badge-off { background: #eef2f6; color: #475569; }
+
+    a.badge {
+      text-decoration: none;
+    }
+
+    .next-badges,
+    .now-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .next-badges .badge,
+    .now-badges .badge { margin-bottom: 0; }
+
+    .hero-title {
+      margin: 0;
+      font-size: 1.7rem;
+      line-height: 1.2;
+    }
+
+    .hero-meta, .next-meta {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .next {
+      margin-bottom: 16px;
+    }
+
+    .next-title {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .days {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      margin-bottom: 12px;
+      padding-bottom: 2px;
+    }
+
+    .day-btn {
+      flex: 1 1 0;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 6px 4px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .day-btn.active {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
+      color: #fff;
+    }
+
+    #schedule {
+      scroll-margin-top: 16px;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 8px;
+    }
+
+    .slot {
+      display: grid;
+      grid-template-columns: 118px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: var(--card-soft);
+      border: 1px solid var(--line);
+    }
+
+    .slot.current {
+      background: #ecfdf5;
+      border-color: #99f6e4;
+    }
+
+    .slot.next-slot {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+    }
+
+    .slot-time {
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.35;
+    }
+
+    .slot-time-msk {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .slot-name {
+      font-weight: 650;
+    }
+
+    .slot-kind {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .kind-lesson { color: var(--lesson); }
+    .kind-extra { color: var(--extra); }
+    .kind-regime { color: var(--regime); }
+    .kind-break { color: var(--break); }
+
+    .empty {
+      color: var(--muted);
+      padding: 18px 8px;
+    }
+
+    .slot-note {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+
+    .top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .top h1 { margin-bottom: 6px; }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .med-btn,
+    .doc-btn {
+      flex: 0 0 auto;
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .doc-btn {
+      border-color: #d6d3d1;
+      background: #f5f5f4;
+      color: #44403c;
+    }
+
+    .memo-text {
+      margin: 0 0 12px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .memo-block { margin: 0 0 14px; }
+
+    .memo-block h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+
+    .memo-block ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .memo-block li { margin: 4px 0; }
+
+    .memo-forbid h3 { color: #b91c1c; }
+
+    .med-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(31, 41, 55, 0.35);
+      z-index: 20;
+    }
+
+    .med-backdrop.open { display: flex; }
+
+    .med-modal.wide {
+      width: min(760px, 100%);
+    }
+
+    .med-modal {
+      width: min(560px, 100%);
+      max-height: calc(100vh - 32px);
+      overflow: auto;
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      padding: 18px 16px 16px;
+      box-shadow: 0 16px 40px rgba(31, 41, 55, 0.16);
+    }
+
+    .med-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .med-head h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .med-close {
+      border: 0;
+      background: #f1f5f9;
+      border-radius: 999px;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+
+    .med-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+
+    .med-table th,
+    .med-table td {
+      border-bottom: 1px solid var(--line);
+      padding: 8px 6px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .med-table tr.today {
+      background: #ecfdf5;
+    }
+
+    .cal-caption {
+      margin: 0 0 10px;
+      font-weight: 700;
+    }
+
+    .cal-note {
+      margin: 8px 0 16px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .med-phones {
+      margin: 12px 0 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .med-phones a { color: #1d4ed8; }
+
+    .contacts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 4px 0 18px;
+    }
+
+    @media (max-width: 640px) {
+      .contacts-row { grid-template-columns: 1fr; }
+    }
+
+    .educators {
+      margin-bottom: 0;
+    }
+
+    .educators-list {
+      display: grid;
+      gap: 8px;
+      margin: 10px 0 0;
+    }
+
+    .person {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 8px;
+    }
+
+    .person-name {
+      font-weight: 650;
+    }
+
+    a.chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: 0.86rem;
+      font-weight: 650;
+      line-height: 1.2;
+    }
+
+    a.chip-profile {
+      background: #eef4ff;
+      color: #1d4ed8;
+      border: 1px solid #d7e3ff;
+    }
+
+    a.chip:hover {
+      filter: brightness(0.97);
+    }
+
+    .staff-link {
+      margin-top: 10px;
+    }
+
+    a.chip-staff {
+      background: #f5f3ff;
+      color: #5b21b6;
+      border: 1px solid #ddd6fe;
+    }
+
+    .med-modal.week {
+      width: min(1040px, 100%);
+    }
+
+    .week-scroll {
+      overflow-x: auto;
+    }
+
+    .week-table {
+      width: 100%;
+      min-width: 720px;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    .week-table th,
+    .week-table td {
+      border: 1px solid var(--line);
+      padding: 6px 5px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.3;
+    }
+
+    .week-table thead th {
+      text-align: center;
+      background: #f8fafc;
+      font-size: 0.82rem;
+    }
+
+    .week-table .week-num {
+      width: 78px;
+      white-space: nowrap;
+      background: #fbfaf6;
+      font-weight: 700;
+    }
+
+    .week-table .week-time {
+      display: block;
+      font-weight: 500;
+      color: var(--muted);
+      font-size: 0.72rem;
+    }
+
+    .week-table .week-section td {
+      background: #f1f5f9;
+      font-weight: 700;
+      font-size: 0.78rem;
+    }
+
+    .week-table .week-today {
+      background: #ecfdf5;
+    }
+
+    .week-table thead th.week-today {
+      background: #d1fae5;
+      color: var(--now);
+    }
+
+    .week-table td.week-now {
+      background: #bbf7d0;
+      font-weight: 700;
+    }
+
+    .week-table td.week-empty {
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>Расписание 7а</h1>
+        <p class="sub">Звонки и распорядок по Москве. В ленте видно местное и московское время.</p>
+      </div>
+      <div class="top-actions">
+        <button type="button" id="week-open" class="med-btn">Расписание</button>
+        <button type="button" id="class-open" class="med-btn">Класс</button>
+        <button type="button" id="cal-open" class="med-btn">Учебный график</button>
+        <button type="button" id="memo-open" class="med-btn">Памятка</button>
+        <button type="button" id="med-open" class="med-btn">Медкабинет</button>
+        <button type="button" id="doc-download" class="doc-btn">Скачать заявление</button>
+      </div>
+    </div>
+
+    <div class="clocks">
+      <div class="card">
+        <div class="clock-label">Местное</div>
+        <div id="local-time" class="clock-time">--:--:--</div>
+        <div id="local-date" class="clock-date"></div>
+      </div>
+      <div class="card">
+        <div class="clock-label">Москва</div>
+        <div id="moscow-time" class="clock-time">--:--:--</div>
+        <div id="moscow-date" class="clock-date"></div>
+      </div>
+    </div>
+
+    <section id="now-card" class="card hero"></section>
+    <section id="next-card" class="card next"></section>
+
+    <p class="clock-label" style="margin: 0 0 8px">Контакты</p>
+    <div class="contacts-row">
+      <section class="card educators">
+        <div class="clock-label">Классный руководитель</div>
+        <div class="educators-list">
+          <div class="person">
+            <a class="chip chip-profile" href="https://edu.tatar.ru/v_uslon/page2756795.htm/page3370873.htm" target="_blank" rel="noopener">Камалетдинова Марина Вячеславовна</a>
+          </div>
+        </div>
+        <div class="staff-link">
+          <a class="chip chip-staff" href="https://edu.tatar.ru/v_uslon/page2756795.htm/page2809806.htm" target="_blank" rel="noopener">Все педагоги лицея</a>
+        </div>
+      </section>
+      <section class="card educators">
+        <div class="clock-label">Воспитатели</div>
+        <div class="educators-list">
+          <div class="person">
+            <a class="chip chip-profile" href="https://edu.tatar.ru/v_uslon/page2756795.htm/page5258964.htm" target="_blank" rel="noopener">Степанов Александр Васильевич</a>
+          </div>
+          <div class="person">
+            <span class="person-name">Владислав Андреевич</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="days" class="days"></div>
+    <div id="schedule">
+      <div id="timeline" class="timeline"></div>
+    </div>
+  </div>
+
+  <div id="med-backdrop" class="med-backdrop" hidden>
+    <div class="med-modal" role="dialog" aria-modal="true" aria-labelledby="med-title">
+      <div class="med-head">
+        <h2 id="med-title">График медкабинета</h2>
+        <button type="button" id="med-close" class="med-close" aria-label="Закрыть">×</button>
+      </div>
+      <table class="med-table">
+        <thead>
+          <tr>
+            <th>День</th>
+            <th>Фагима Явитовна, врач</th>
+            <th>Гузалия Альбертовна, медсестра</th>
+          </tr>
+        </thead>
+        <tbody id="med-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="class-backdrop" class="med-backdrop" hidden>
+    <div class="med-modal wide" role="dialog" aria-modal="true" aria-labelledby="class-title">
+      <div class="med-head">
+        <h2 id="class-title">Список класса 7а</h2>
+        <button type="button" id="class-close" class="med-close" aria-label="Закрыть">×</button>
+      </div>
+      <table class="med-table">
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>Ребёнок</th>
+            <th>Родитель</th>
+            <th>Город</th>
+          </tr>
+        </thead>
+        <tbody id="class-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="cal-backdrop" class="med-backdrop" hidden>
+    <div class="med-modal" role="dialog" aria-modal="true" aria-labelledby="cal-title">
+      <div class="med-head">
+        <h2 id="cal-title">Календарный учебный график</h2>
+        <button type="button" id="cal-close" class="med-close" aria-label="Закрыть">×</button>
+      </div>
+      <p class="memo-text">
+        ГАОУ «Лицей Иннополис», 2026–2027 учебный год.
+        Учебный год делится на четверти.
+      </p>
+      <p class="cal-caption">Таблица 1. Границы учебных четвертей</p>
+      <table class="med-table">
+        <thead>
+          <tr>
+            <th>Четверть</th>
+            <th>Начало</th>
+            <th>Окончание</th>
+            <th>Длительность</th>
+          </tr>
+        </thead>
+        <tbody id="cal-terms"></tbody>
+      </table>
+      <p class="cal-caption" style="margin-top:16px">Таблица 2. График каникул</p>
+      <table class="med-table">
+        <thead>
+          <tr>
+            <th>Каникулы</th>
+            <th>Начало</th>
+            <th>Окончание</th>
+            <th>Начало занятий</th>
+            <th>Длительность</th>
+          </tr>
+        </thead>
+        <tbody id="cal-holidays"></tbody>
+      </table>
+      <p id="cal-status" class="cal-note"></p>
+    </div>
+  </div>
+
+  <div id="memo-backdrop" class="med-backdrop" hidden>
+    <div class="med-modal" role="dialog" aria-modal="true" aria-labelledby="memo-title">
+      <div class="med-head">
+        <h2 id="memo-title">Памятка по питанию</h2>
+        <button type="button" id="memo-close" class="med-close" aria-label="Закрыть">×</button>
+      </div>
+      <p class="memo-text">
+        Памятка по питанию воспитанников в интернате при ГАОУ «Лицей Иннополис».
+        Воспитанники обеспечиваются пятиразовым питанием: завтрак, второй завтрак, обед, полдник, ужин.
+        При необходимости родители могут давать продукты, разрешённые для хранения и употребления в интернате.
+      </p>
+      <div class="memo-block">
+        <h3>Можно</h3>
+        <ul>
+          <li>Печенье</li>
+          <li>Соки (упаковки не более 0,5 л)</li>
+          <li>Негазированные напитки</li>
+          <li>Шоколад и сладости (в умеренном количестве)</li>
+          <li>Вода</li>
+          <li>Фрукты: свежие бананы, яблоки, цитрусовые, не более 1 кг</li>
+          <li>Орехи (кроме арахиса)</li>
+          <li>Мёд</li>
+        </ul>
+      </div>
+      <div class="memo-block memo-forbid">
+        <h3>Категорически запрещается</h3>
+        <ul>
+          <li>Молочные и кисломолочные продукты</li>
+          <li>Копчёности</li>
+          <li>Колбасы</li>
+          <li>Мясные и рыбные консервы</li>
+          <li>Салаты</li>
+          <li>Майонез, кетчуп, соусы</li>
+          <li>Выпечка: домашние пироги, пицца, торты и т.п.</li>
+          <li>Фрукты: виноград, киви, груша, ягоды</li>
+          <li>Маринованные изделия</li>
+          <li>Чипсы, сухарики, семечки, попкорн</li>
+          <li>Сухие супы быстрого приготовления: лапша, пюре, каши и т.д.</li>
+          <li>Лапша быстрого приготовления</li>
+          <li>Газированные напитки, кофе</li>
+        </ul>
+      </div>
+      <p class="memo-text">Запрещённые продукты, принесённые в лицей, будут изыматься.</p>
+    </div>
+  </div>
+
+  <div id="week-backdrop" class="med-backdrop" hidden>
+    <div class="med-modal week" role="dialog" aria-modal="true" aria-labelledby="week-title">
+      <div class="med-head">
+        <h2 id="week-title">Уроки и доп. занятия 7а</h2>
+        <button type="button" id="week-close" class="med-close" aria-label="Закрыть">×</button>
+      </div>
+      <p class="cal-note">Время московское. Суббота — до 5-го урока, без допок.</p>
+      <div class="week-scroll">
+        <table id="week-table" class="week-table"></table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const MOSCOW = "Europe/Moscow";
+    const DAY_LABELS = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
+    const DAY_FULL = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
+
+    const LESSONS = {
+      1: ["Разговор о важном", "Английский язык", "Английский язык", "Физика", "Музыка", "Физ-ра"],
+      2: ["География", "Физика", "Родной язык", "Алгебра", "Алгебра", "Русский язык"],
+      3: ["Родной язык", "Алгебра", "Геометрия", "География", "Русский язык", "Литература"],
+      4: ["Информатика", "Информатика", "Алгебра", "Английский язык", "ИЗО", "История"],
+      5: ["Русский язык", "Биология", "История", "Физика", "Геометрия", "Родная литература"],
+      6: ["Физ-ра", "Русский язык", "Литература", "ВиС", "История"]
+    };
+
+    const EXTRAS = {
+      1: ["Информатика", "Робототехника", "ИБ"],
+      2: ["Олимпиадная физика (2.4)", "Я — лицеист", "НТО"],
+      3: ["Олимпиадная математика 3.11/3.4, Шубин Г.К., Костанян А.А.", "Олимпиадная математика 3.11/3.4, Шубин Г.К., Костанян А.А.", "ИСИИ"],
+      4: ["Программирование 2.8/2.9, Ишимбаев А.Н., Т-банк", "Программирование 2.8/2.9, Ишимбаев А.Н., Т-банк", "Программирование 2.8/2.9, Ишимбаев А.Н., Т-банк"],
+      5: ["Технология", "Технология", "Классный час"]
+    };
+
+    const BELLS = [
+      { start: "07:00", end: "07:02", kind: "regime", title: "Подъём" },
+      { start: "07:02", end: "07:10", kind: "regime", title: "Зарядка" },
+      { start: "07:10", end: "07:25", kind: "regime", title: "Личная гигиена", note: "Умыться, почистить зубы, принять душ" },
+      { start: "07:25", end: "07:30", kind: "regime", title: "Уборка места", note: "Заправить постель, навести порядок в тумбочке и на полке" },
+      { start: "07:30", end: "07:45", kind: "regime", title: "Телефоны и подготовка к занятиям", note: "Получение телефонов в воспитательской. Одеть форму, собрать в рюкзак учебники, тетради и принадлежности" },
+      { start: "07:45", end: "07:55", kind: "regime", title: "Сдача телефонов, уход на занятия", note: "Интернат закрывается" },
+      { start: "07:55", end: "08:00", kind: "break", title: "Переход к занятиям" },
+      { start: "08:00", end: "08:40", kind: "lesson", lesson: 1 },
+      { start: "08:40", end: "09:00", kind: "regime", title: "Завтрак", note: "По расписанию лицея" },
+      { start: "09:00", end: "09:40", kind: "lesson", lesson: 2 },
+      { start: "09:40", end: "09:50", kind: "break", title: "Перемена" },
+      { start: "09:50", end: "10:30", kind: "lesson", lesson: 3 },
+      { start: "10:30", end: "10:40", kind: "break", title: "Перемена" },
+      { start: "10:40", end: "11:20", kind: "lesson", lesson: 4 },
+      { start: "11:20", end: "11:30", kind: "break", title: "Перемена" },
+      { start: "11:30", end: "12:10", kind: "lesson", lesson: 5 },
+      { start: "12:10", end: "12:20", kind: "break", title: "Перемена" },
+      { start: "12:20", end: "13:00", kind: "regime", title: "Обед / прогулка", note: "По расписанию лицея" },
+      { start: "13:00", end: "13:40", kind: "lesson", lesson: 6 },
+      { start: "13:40", end: "14:00", kind: "break", title: "Перерыв" },
+      { start: "14:00", end: "14:40", kind: "extra", extra: 1 },
+      { start: "14:40", end: "14:50", kind: "break", title: "Перемена" },
+      { start: "14:50", end: "15:30", kind: "extra", extra: 2 },
+      { start: "15:30", end: "15:50", kind: "regime", title: "Полдник" },
+      { start: "15:50", end: "16:30", kind: "extra", extra: 3, extraFallback: "Самоподготовка" },
+      { start: "16:30", end: "16:55", kind: "regime", title: "Получение телефонов", note: "Переодеться, разместить учебные вещи в комнате" },
+      { start: "16:55", end: "17:00", kind: "break", title: "Перерыв" },
+      { start: "17:00", end: "17:30", kind: "regime", title: "Ужин" },
+      { start: "17:30", end: "18:25", kind: "regime", title: "Прогулка по городу", note: "7 класс — в сопровождении воспитателя. 10–11 класс — с разрешения, без сопровождения, запись в журнале" },
+      { start: "18:25", end: "18:30", kind: "break", title: "Перерыв" },
+      { start: "18:30", end: "20:20", kind: "regime", title: "Самоподготовка", note: "Все находятся в закреплённых аудиториях" },
+      { start: "20:20", end: "20:40", kind: "regime", title: "Второй ужин" },
+      { start: "20:40", end: "21:40", kind: "regime", title: "Прогулка / отдых, кружки и секции", note: "Прогулка на территории лицея с разрешения воспитателя" },
+      { start: "21:40", end: "22:00", kind: "regime", title: "Свободное время" },
+      { start: "22:00", end: "22:05", kind: "regime", title: "Сдача телефонов", note: "Будильник на телефонах отключить" },
+      { start: "22:05", end: "22:25", kind: "regime", title: "Подготовка ко сну, личная гигиена", note: "Умыться, почистить зубы, принять душ, приготовить постель, набрать воды, погладить одежду, почистить обувь, высушить волосы, снять линзы, проверить витамины" },
+      { start: "22:25", end: "22:30", kind: "break", title: "К отбою" },
+      { start: "22:30", end: "24:00", kind: "regime", title: "Отбой", note: "Все в кровати. Передвижение по комнатам и коридору запрещено" }
+    ];
+
+    const MED_DAYS = [
+      { day: 1, doctor: "14:30–20:30", nurse: "07:30–13:30" },
+      { day: 2, doctor: "07:30–13:30", nurse: "14:30–20:30" },
+      { day: 3, doctor: "14:30–20:30", nurse: "07:30–13:30" },
+      { day: 4, doctor: "07:30–13:30", nurse: "14:30–20:30" },
+      { day: 5, doctor: "14:30–20:30", nurse: "07:30–13:30" },
+      { day: 6, doctor: "07:30–12:00", nurse: "по графику", saturday: true }
+    ];
+
+    const CLASSMATES = [
+      { child: "Верещагин Лев Антонович", parent: "Верещагина Анна Викторовна", city: "Новосибирск" },
+      { child: "Рахматуллин Альфир Артурович", parent: "Рахматуллина Амина Рауфовна", city: "Казань" },
+      { child: "Печерская Дарья Андреевна", parent: "Печерская Татьяна Александровна", city: "Зеленодольск" },
+      { child: "Салина Виктория Николаевна", parent: "Сабирова Гульфия Минихатовна", city: "Казань" },
+      { child: "Усманов Артём Маратович", parent: "Подоплеловы Анна Леонидовна", city: "Йошкар-Ола" },
+      { child: "Ибатуллина София Айратовна", parent: "Бережная Мария Рашидовна", city: "Казань" },
+      { child: "Алексеев Алексей Николаевич", parent: "Емельянова Татьяна Петровна", city: "Канаш" },
+      { child: "Иванов Олег Сергеевич", parent: "Иванова Виктория Сергеевна", city: "Иннополис" },
+      { child: "Садреддинов Рашид Ханбаба оглы", parent: "Асадова Гюльмира Агамурад кызы", city: "Ярославль" },
+      { child: "Хайруллов Тимур Робертович", parent: "Хайруллова Юлия Владимировна", city: "Казань" },
+      { child: "Зимин Егор Александрович", parent: "Зимина Марина Валерьевна", city: "Иннополис" },
+      { child: "Закиев Камиль Василевич", parent: "Закиева Евгения Алексеевна", city: "Иннополис" },
+      { child: "Миркасимов Вильдан Мирзагитович", parent: "Миркасимова Наргиз Ибрагимовна", city: "Бугульма" },
+      { child: "Курманова Аделия Маратовна", parent: "Курманова Анастасия Константиновна", city: "Казань" }
+    ];
+
+    const CAL_TERMS = [
+      { name: "Первая", start: "2026-09-01", end: "2026-10-30", length: "9 недель" },
+      { name: "Вторая", start: "2026-11-09", end: "2026-12-28", length: "7 недель" },
+      { name: "Третья", start: "2027-01-11", end: "2027-03-26", length: "11 недель" },
+      { name: "Четвёртая", start: "2027-04-05", end: "2027-05-26", length: "7 недель" }
+    ];
+
+    const CAL_HOLIDAYS = [
+      { name: "Осенние", start: "2026-10-31", end: "2026-11-08", back: "2026-11-09", length: "9 календарных дней с учётом праздничных дней" },
+      { name: "Зимние", start: "2026-12-29", end: "2027-01-10", back: "2027-01-11", length: "13 календарных дней" },
+      { name: "Весенние", start: "2027-03-27", end: "2027-04-04", back: "2027-04-05", length: "9 календарных дней" }
+    ];
+
+    const KIND_LABEL = {
+      lesson: "Урок",
+      extra: "Доп. занятие",
+      regime: "Режим дня",
+      break: "Пауза"
+    };
+
+    let selectedWeekday = null;
+    const localZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    function moscowParts(date) {
+      const parts = new Intl.DateTimeFormat("en-GB", {
+        timeZone: MOSCOW,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        weekday: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hourCycle: "h23"
+      }).formatToParts(date);
+
+      const map = {};
+      parts.forEach((part) => {
+        if (part.type !== "literal") {
+          map[part.type] = part.value;
+        }
+      });
+
+      return map;
+    }
+
+    function weekdayFromMoscow(date) {
+      const weekday = new Intl.DateTimeFormat("en-US", {
+        timeZone: MOSCOW,
+        weekday: "short"
+      }).format(date);
+
+      const map = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+      return map[weekday];
+    }
+
+    function minutesFromHHMM(value) {
+      const pieces = value.split(":");
+      const hours = Number(pieces[0]);
+      const minutes = Number(pieces[1]);
+      return hours * 60 + minutes;
+    }
+
+    function moscowMinutes(date) {
+      const parts = moscowParts(date);
+      const hours = Number(parts.hour);
+      const minutes = Number(parts.minute);
+      const seconds = Number(parts.second);
+      return hours * 60 + minutes + seconds / 60;
+    }
+
+    function formatClock(date, timeZone) {
+      return new Intl.DateTimeFormat("ru-RU", {
+        timeZone,
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23"
+      }).format(date);
+    }
+
+    function formatDate(date, timeZone) {
+      return new Intl.DateTimeFormat("ru-RU", {
+        timeZone,
+        weekday: "long",
+        day: "numeric",
+        month: "long"
+      }).format(date);
+    }
+
+    function formatLocalRange(date, startHHMM, endHHMM) {
+      const start = localTimeFromMoscowSlot(date, startHHMM);
+      const end = localTimeFromMoscowSlot(date, endHHMM);
+      return start + "–" + end;
+    }
+
+    function localTimeFromMoscowSlot(date, hhmm) {
+      const parts = moscowParts(date);
+      const year = Number(parts.year);
+      const month = Number(parts.month);
+      const day = Number(parts.day);
+      const clock = hhmm === "24:00" ? "00:00" : hhmm;
+      const pieces = clock.split(":");
+      const hour = Number(pieces[0]) % 24;
+      const minute = Number(pieces[1]);
+      const dayOffset = hhmm === "24:00" ? 1 : 0;
+      const utcGuess = Date.UTC(year, month - 1, day + dayOffset, hour, minute, 0);
+      const asIfMoscow = new Date(utcGuess);
+      const shown = new Intl.DateTimeFormat("en-GB", {
+        timeZone: MOSCOW,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23"
+      }).formatToParts(asIfMoscow);
+
+      const shownMap = {};
+      shown.forEach((part) => {
+        if (part.type !== "literal") {
+          shownMap[part.type] = part.value;
+        }
+      });
+
+      const shownUtc = Date.UTC(
+        Number(shownMap.year),
+        Number(shownMap.month) - 1,
+        Number(shownMap.day),
+        Number(shownMap.hour),
+        Number(shownMap.minute)
+      );
+      const wantedUtc = Date.UTC(year, month - 1, day + dayOffset, hour, minute);
+      const shift = shownUtc - wantedUtc;
+      const real = new Date(utcGuess - shift);
+
+      return new Intl.DateTimeFormat("ru-RU", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23"
+      }).format(real);
+    }
+
+    function slotTitle(bell, weekday) {
+      if (bell.kind === "lesson") {
+        const dayLessons = LESSONS[weekday] || [];
+        const subject = dayLessons[bell.lesson - 1];
+        if (!subject) {
+          return "Окно";
+        }
+        return subject;
+      }
+
+      if (bell.kind === "extra") {
+        const dayExtras = EXTRAS[weekday] || [];
+        const subject = dayExtras[bell.extra - 1];
+        if (subject) {
+          return subject;
+        }
+        if (bell.extraFallback) {
+          return bell.extraFallback;
+        }
+        return "Свободный слот";
+      }
+
+      return bell.title;
+    }
+
+    function slotKindLabel(bell, weekday) {
+      if (bell.kind === "lesson") {
+        const dayLessons = LESSONS[weekday] || [];
+        const subject = dayLessons[bell.lesson - 1];
+        if (!subject) {
+          return "Нет урока";
+        }
+        return "Урок " + bell.lesson;
+      }
+
+      if (bell.kind === "extra") {
+        return "Доп. занятие " + bell.extra;
+      }
+
+      return KIND_LABEL[bell.kind];
+    }
+
+    const MEAL_TITLES = ["Завтрак", "Обед / прогулка", "Полдник", "Ужин", "Второй ужин"];
+
+    function copySlot(slot) {
+      return {
+        start: slot.start,
+        end: slot.end,
+        kind: slot.kind,
+        title: slot.title,
+        kindLabel: slot.kindLabel,
+        note: slot.note
+      };
+    }
+
+    function sundayMealSlots() {
+      const slots = [];
+      for (let i = 0; i < BELLS.length; i += 1) {
+        const bell = BELLS[i];
+        const mealIndex = MEAL_TITLES.indexOf(bell.title);
+        if (mealIndex === -1) {
+          continue;
+        }
+        slots.push({
+          start: bell.start,
+          end: bell.end,
+          kind: "regime",
+          title: bell.title,
+          kindLabel: "Режим дня",
+          note: bell.note || ""
+        });
+      }
+      for (let i = 0; i < slots.length; i += 1) {
+        slots[i].index = i;
+      }
+      return slots;
+    }
+
+    function isFreeTimeSlot(slot) {
+      return slot.title === "Свободное время";
+    }
+
+    function canMergeFreeBreak(prev, slot) {
+      const prevMergeable = isFreeTimeSlot(prev) || prev.kind === "break";
+      const slotMergeable = isFreeTimeSlot(slot) || slot.kind === "break";
+      if (!prevMergeable || !slotMergeable) {
+        return false;
+      }
+      return isFreeTimeSlot(prev) || isFreeTimeSlot(slot);
+    }
+
+    function mergeSaturdayFreeTime(slots) {
+      const merged = [];
+      for (let i = 0; i < slots.length; i += 1) {
+        const slot = slots[i];
+        if (merged.length === 0) {
+          merged.push(copySlot(slot));
+          continue;
+        }
+        const prev = merged[merged.length - 1];
+        const canMerge = canMergeFreeBreak(prev, slot);
+        if (!canMerge) {
+          merged.push(copySlot(slot));
+          continue;
+        }
+        prev.end = slot.end;
+        prev.title = "Свободное время";
+        prev.kind = "regime";
+        prev.kindLabel = "Режим дня";
+        prev.note = "";
+      }
+      for (let i = 0; i < merged.length; i += 1) {
+        merged[i].index = i;
+      }
+      return merged;
+    }
+
+    function buildDaySlots(weekday) {
+      if (weekday === 0) {
+        return sundayMealSlots();
+      }
+
+      const dayBells = BELLS.filter((bell) => {
+        if (weekday !== 6) {
+          return true;
+        }
+        if (bell.kind === "extra") {
+          return false;
+        }
+        if (bell.kind === "lesson" && bell.lesson > 5) {
+          return false;
+        }
+        if (bell.title === "Получение телефонов") {
+          return false;
+        }
+        if (bell.title === "Самоподготовка") {
+          return false;
+        }
+        return true;
+      });
+
+      const rawSlots = dayBells.map((bell) => {
+        const title = slotTitle(bell, weekday);
+        const kindLabel = slotKindLabel(bell, weekday);
+        const isSaturdayPhone = weekday === 6 && bell.start === "12:10" && bell.end === "12:20";
+        if (isSaturdayPhone) {
+          return {
+            start: bell.start,
+            end: bell.end,
+            kind: "regime",
+            title: "Получение телефонов",
+            kindLabel: "Режим дня",
+            note: "После 5-го урока"
+          };
+        }
+        return {
+          start: bell.start,
+          end: bell.end,
+          kind: bell.kind,
+          title,
+          kindLabel,
+          note: bell.note || ""
+        };
+      });
+      const withGaps = fillSlotGaps(rawSlots);
+      if (weekday === 6) {
+        return mergeSaturdayFreeTime(withGaps);
+      }
+      return withGaps;
+    }
+
+    function fillSlotGaps(slots) {
+      const filled = [];
+      for (let i = 0; i < slots.length; i += 1) {
+        const slot = slots[i];
+        if (filled.length > 0) {
+          const prev = filled[filled.length - 1];
+          if (prev.end !== slot.start) {
+            filled.push({
+              start: prev.end,
+              end: slot.start,
+              kind: "regime",
+              title: "Свободное время",
+              kindLabel: "Режим дня",
+              note: ""
+            });
+          }
+        }
+        filled.push({
+          start: slot.start,
+          end: slot.end,
+          kind: slot.kind,
+          title: slot.title,
+          kindLabel: slot.kindLabel,
+          note: slot.note
+        });
+      }
+
+      for (let i = 0; i < filled.length; i += 1) {
+        filled[i].index = i;
+      }
+      return filled;
+    }
+
+    function findCurrentAndNext(now, weekday) {
+      const slots = buildDaySlots(weekday);
+      const nowMin = moscowMinutes(now);
+
+      for (let i = 0; i < slots.length; i += 1) {
+        const slot = slots[i];
+        const start = minutesFromHHMM(slot.start);
+        const end = minutesFromHHMM(slot.end);
+        if (nowMin >= start && nowMin < end) {
+          return {
+            current: slot,
+            next: slots[i + 1] || null,
+            remainMin: end - nowMin
+          };
+        }
+      }
+
+      const upcoming = slots.find((slot) => nowMin < minutesFromHHMM(slot.start));
+      return {
+        current: null,
+        next: upcoming || null,
+        remainMin: upcoming ? minutesFromHHMM(upcoming.start) - nowMin : null
+      };
+    }
+
+    function dayViewLink(hash) {
+      const target = hash || "#schedule";
+      return '<a class="badge badge-off" href="' + target + '">Просмотр дня</a>';
+    }
+
+    function isSleepingNow(now) {
+      const nowMin = moscowMinutes(now);
+      const sleepStart = 22 * 60 + 30;
+      const wakeTime = 7 * 60;
+      return nowMin >= sleepStart || nowMin < wakeTime;
+    }
+
+    function isRealLesson(slot) {
+      if (!slot) {
+        return false;
+      }
+      if (slot.kind !== "lesson") {
+        return false;
+      }
+      if (slot.title === "Окно") {
+        return false;
+      }
+      return true;
+    }
+
+    function childHasPhone(now, weekday, currentSlot) {
+      const sleeping = isSleepingNow(now);
+      if (sleeping) {
+        return false;
+      }
+
+      const nowMin = moscowMinutes(now);
+      const morningStart = 7 * 60 + 30;
+      const morningEnd = 7 * 60 + 45;
+      const eveningStart = 16 * 60 + 30;
+      const eveningEnd = 22 * 60;
+      const saturdayGive = 12 * 60 + 10;
+
+      if (weekday === 0) {
+        return true;
+      }
+
+      if (weekday === 6) {
+        return nowMin >= saturdayGive && nowMin < eveningEnd;
+      }
+
+      if (nowMin >= morningStart && nowMin < morningEnd) {
+        return true;
+      }
+      if (nowMin >= eveningStart && nowMin < eveningEnd) {
+        return true;
+      }
+      return false;
+    }
+
+    function nextPhoneInMinutes(now, weekday, currentSlot) {
+      const nowMin = moscowMinutes(now);
+      const wakeTime = 7 * 60;
+      const morningStart = 7 * 60 + 30;
+      const eveningStart = 16 * 60 + 30;
+      const saturdayGive = 12 * 60 + 10;
+      const minutesInDay = 24 * 60;
+
+      if (weekday === 6) {
+        if (nowMin < saturdayGive) {
+          return saturdayGive - nowMin;
+        }
+        return minutesInDay - nowMin + wakeTime;
+      }
+
+      if (weekday === 0) {
+        if (nowMin < wakeTime) {
+          return wakeTime - nowMin;
+        }
+        return minutesInDay - nowMin + morningStart;
+      }
+
+      if (nowMin < morningStart) {
+        return morningStart - nowMin;
+      }
+      if (nowMin < eveningStart) {
+        return eveningStart - nowMin;
+      }
+      if (weekday === 5) {
+        return minutesInDay - nowMin + saturdayGive;
+      }
+      return minutesInDay - nowMin + morningStart;
+    }
+
+    function nextSaturdayLessonStart(nowMin) {
+      const dayLessons = LESSONS[6] || [];
+      for (let i = 0; i < BELLS.length; i += 1) {
+        const bell = BELLS[i];
+        if (bell.kind !== "lesson") {
+          continue;
+        }
+        const subject = dayLessons[bell.lesson - 1];
+        if (!subject) {
+          continue;
+        }
+        const start = minutesFromHHMM(bell.start);
+        if (start > nowMin) {
+          return start;
+        }
+      }
+      return null;
+    }
+
+    function phoneLeftInMinutes(now, weekday) {
+      const nowMin = moscowMinutes(now);
+      const morningEnd = 7 * 60 + 45;
+      const eveningEnd = 22 * 60;
+      const sleepStart = 22 * 60 + 30;
+
+      if (weekday === 0) {
+        return sleepStart - nowMin;
+      }
+
+      if (weekday === 6) {
+        return eveningEnd - nowMin;
+      }
+
+      if (nowMin < morningEnd) {
+        return morningEnd - nowMin;
+      }
+      return eveningEnd - nowMin;
+    }
+
+    function phoneBadge(now, weekday, currentSlot) {
+      const hasPhone = childHasPhone(now, weekday, currentSlot);
+      if (hasPhone) {
+        const leftMin = phoneLeftInMinutes(now, weekday);
+        const leftText = formatRemain(leftMin);
+        return '<span class="badge badge-phone-yes">Телефон у ребёнка · ещё ' + leftText + '</span>';
+      }
+      const remainMin = nextPhoneInMinutes(now, weekday, currentSlot);
+      const remainText = formatRemain(remainMin);
+      return '<span class="badge badge-phone-no">Телефона нет · через ' + remainText + '</span>';
+    }
+
+    function nowBadges(hash, phoneHtml) {
+      const extra = phoneHtml || "";
+      return '<div class="now-badges"><span class="badge badge-now">Сейчас</span>' +
+        dayViewLink(hash) + extra + '</div>';
+    }
+
+    function nowOffBadges(hash, phoneHtml) {
+      const extra = phoneHtml || "";
+      return '<div class="now-badges"><span class="badge badge-off">Сейчас</span>' +
+        dayViewLink(hash) + extra + '</div>';
+    }
+
+    function nextBadges() {
+      return '<div class="next-badges"><span class="badge badge-next">Дальше</span></div>';
+    }
+
+    function formatRemain(minutesFloat) {
+      if (minutesFloat === null || minutesFloat === undefined) {
+        return "";
+      }
+      const totalMinutes = Math.max(0, Math.round(minutesFloat));
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+      if (hours > 0) {
+        return hours + " ч " + minutes + " мин";
+      }
+      if (minutes > 0) {
+        return minutes + " мин";
+      }
+      return "меньше минуты";
+    }
+
+    function renderClocks(now) {
+      document.getElementById("local-time").textContent = formatClock(now, localZone);
+      document.getElementById("local-date").textContent = formatDate(now, localZone) + " · " + localZone;
+      document.getElementById("moscow-time").textContent = formatClock(now, MOSCOW);
+      document.getElementById("moscow-date").textContent = formatDate(now, MOSCOW);
+    }
+
+    function renderNow(now, moscowWeekday, state) {
+      const nowCard = document.getElementById("now-card");
+      const nextCard = document.getElementById("next-card");
+
+      const phoneHtml = phoneBadge(now, moscowWeekday, state.current);
+
+      if (moscowWeekday === 0 && !state.current) {
+        nowCard.innerHTML = nowOffBadges("#schedule", phoneHtml) +
+          '<h2 class="hero-title">Выходной</h2>' +
+          '<p class="hero-meta">В воскресенье по Москве занятий нет.</p>';
+        if (!state.next) {
+          nextCard.innerHTML = nextBadges() +
+            '<h3 class="next-title">Понедельник, подъём</h3>' +
+            '<p class="next-meta">07:00 МСК</p>';
+          return;
+        }
+        const sundayNextRange = formatLocalRange(now, state.next.start, state.next.end);
+        const sundayNextNote = state.next.note ? '<br>' + state.next.note : "";
+        nextCard.innerHTML =
+          nextBadges() +
+          '<h3 class="next-title">' + state.next.title + '</h3>' +
+          '<p class="next-meta">' + state.next.kindLabel + sundayNextNote +
+          '<br>Местное время: ' + sundayNextRange +
+          '<br>Москва: <b>' + state.next.start + '–' + state.next.end + '</b>' +
+          '<br>Через: ' + formatRemain(state.remainMin) + '</p>';
+        return;
+      }
+
+      if (!state.current) {
+        let idleTitle = "День уже закончился";
+        if (state.next && state.next.index === 0) {
+          idleTitle = "Ещё не началось";
+        } else if (state.next) {
+          idleTitle = "Свободное время";
+        }
+        nowCard.innerHTML = nowOffBadges("#schedule", phoneHtml) + '<h2 class="hero-title">' +
+          idleTitle +
+          '</h2><p class="hero-meta">По Москве сейчас нет активного слота.</p>';
+      } else {
+        const localRange = formatLocalRange(now, state.current.start, state.current.end);
+        const currentNote = state.current.note ? '<br>' + state.current.note : '';
+        nowCard.innerHTML =
+          nowBadges("#slot-" + state.current.index, phoneHtml) +
+          '<h2 class="hero-title">' + state.current.title + '</h2>' +
+          '<p class="hero-meta">' + state.current.kindLabel + currentNote +
+          '<br>Местное время: ' + localRange +
+          '<br>Москва: <b>' + state.current.start + '–' + state.current.end + '</b>' +
+          '<br>До конца: ' + formatRemain(state.remainMin) + '</p>';
+      }
+
+      if (!state.next) {
+        nextCard.innerHTML = nextBadges() + '<h3 class="next-title">Больше ничего сегодня</h3><p class="next-meta">Следующий учебный день начнётся в понедельник или завтра утром.</p>';
+        return;
+      }
+
+      const nextRange = formatLocalRange(now, state.next.start, state.next.end);
+      const untilNext = state.current
+        ? minutesFromHHMM(state.next.start) - moscowMinutes(now)
+        : state.remainMin;
+
+      const nextNote = state.next.note ? '<br>' + state.next.note : '';
+      nextCard.innerHTML =
+        nextBadges() +
+        '<h3 class="next-title">' + state.next.title + '</h3>' +
+        '<p class="next-meta">' + state.next.kindLabel + nextNote +
+        '<br>Местное время: ' + nextRange +
+        '<br>Москва: <b>' + state.next.start + '–' + state.next.end + '</b>' +
+        '<br>Через: ' + formatRemain(untilNext) + '</p>';
+    }
+
+    function renderDays(moscowWeekday) {
+      const root = document.getElementById("days");
+      root.innerHTML = "";
+
+      [1, 2, 3, 4, 5, 6, 0].forEach((day) => {
+        const button = document.createElement("button");
+        button.className = "day-btn" + (day === selectedWeekday ? " active" : "");
+        button.textContent = DAY_LABELS[day];
+        button.addEventListener("click", () => {
+          selectedWeekday = day;
+          tick();
+        });
+        root.appendChild(button);
+      });
+    }
+
+    function renderTimeline(now, weekday, state) {
+      const root = document.getElementById("timeline");
+      const slots = buildDaySlots(weekday);
+
+      root.innerHTML = "";
+      const heading = document.createElement("div");
+      heading.className = "sub";
+      heading.textContent = DAY_FULL[weekday] + " · местное и московское время";
+      root.appendChild(heading);
+
+      slots.forEach((slot) => {
+        const row = document.createElement("div");
+        row.className = "slot";
+        if (state.current && slot.index === state.current.index && weekday === weekdayFromMoscow(now)) {
+          row.classList.add("current");
+        } else if (state.next && slot.index === state.next.index && weekday === weekdayFromMoscow(now)) {
+          row.classList.add("next-slot");
+        }
+
+        row.id = "slot-" + slot.index;
+
+        const time = document.createElement("div");
+        time.className = "slot-time";
+        const localLine = document.createElement("div");
+        localLine.textContent = formatLocalRange(now, slot.start, slot.end);
+        const moscowLine = document.createElement("div");
+        moscowLine.className = "slot-time-msk";
+        moscowLine.textContent = slot.start + "–" + slot.end + " МСК";
+        time.appendChild(localLine);
+        time.appendChild(moscowLine);
+
+        const body = document.createElement("div");
+        const name = document.createElement("div");
+        name.className = "slot-name";
+        name.textContent = slot.title;
+        const kind = document.createElement("div");
+        kind.className = "slot-kind kind-" + slot.kind;
+        kind.textContent = slot.kindLabel;
+        body.appendChild(name);
+        body.appendChild(kind);
+        if (slot.note) {
+          const note = document.createElement("div");
+          note.className = "slot-note";
+          note.textContent = slot.note;
+          body.appendChild(note);
+        }
+
+        row.appendChild(time);
+        row.appendChild(body);
+        root.appendChild(row);
+      });
+    }
+
+    function tick() {
+      const now = new Date();
+      const moscowWeekday = weekdayFromMoscow(now);
+      if (selectedWeekday === null) {
+        selectedWeekday = moscowWeekday;
+      }
+
+      const viewingToday = selectedWeekday === moscowWeekday;
+      const state = viewingToday
+        ? findCurrentAndNext(now, moscowWeekday)
+        : { current: null, next: buildDaySlots(selectedWeekday)[0] || null, remainMin: null };
+
+      renderClocks(now);
+      renderNow(now, viewingToday ? moscowWeekday : selectedWeekday, viewingToday ? state : {
+        current: null,
+        next: state.next,
+        remainMin: null
+      });
+
+      if (!viewingToday) {
+        const nextCard = document.getElementById("next-card");
+        const first = buildDaySlots(selectedWeekday)[0];
+        if (first) {
+          nextCard.innerHTML =
+            nextBadges() +
+            '<h3 class="next-title">' + first.title + '</h3>' +
+            '<p class="next-meta">' + first.kindLabel +
+            '<br>Местное время: ' + formatLocalRange(now, first.start, first.end) +
+            '<br>Москва: <b>' + first.start + '–' + first.end + '</b>' +
+            (first.note ? '<br>' + first.note : '') + '</p>';
+        }
+
+        const nowCard = document.getElementById("now-card");
+        nowCard.innerHTML =
+          dayViewLink("#schedule") +
+          '<h2 class="hero-title">' + DAY_FULL[selectedWeekday] + '</h2>' +
+          '<p class="hero-meta">Это не сегодня. Ниже полное расписание с местным и московским временем.</p>';
+      }
+
+      renderDays(moscowWeekday);
+      renderTimeline(now, selectedWeekday, viewingToday ? state : { current: null, next: null });
+      refreshWeekTableIfOpen();
+    }
+
+    function renderMedTable(moscowWeekday) {
+      const body = document.getElementById("med-body");
+      body.innerHTML = "";
+
+      MED_DAYS.forEach((row) => {
+        const tr = document.createElement("tr");
+        if (row.day === moscowWeekday) {
+          tr.className = "today";
+        }
+
+        const dayCell = document.createElement("td");
+        dayCell.textContent = DAY_FULL[row.day];
+        const doctorCell = document.createElement("td");
+        const nurseCell = document.createElement("td");
+
+        if (row.saturday) {
+          doctorCell.colSpan = 2;
+          doctorCell.textContent = "07:30–12:00 (по графику)";
+          tr.appendChild(dayCell);
+          tr.appendChild(doctorCell);
+        } else {
+          doctorCell.textContent = row.doctor;
+          nurseCell.textContent = row.nurse;
+          tr.appendChild(dayCell);
+          tr.appendChild(doctorCell);
+          tr.appendChild(nurseCell);
+        }
+
+        body.appendChild(tr);
+      });
+    }
+
+    function openDialog(id) {
+      const backdrop = document.getElementById(id);
+      backdrop.hidden = false;
+      backdrop.classList.add("open");
+    }
+
+    function closeDialog(id) {
+      const backdrop = document.getElementById(id);
+      backdrop.classList.remove("open");
+      backdrop.hidden = true;
+    }
+
+    function openMed() {
+      const moscowWeekday = weekdayFromMoscow(new Date());
+      renderMedTable(moscowWeekday);
+      openDialog("med-backdrop");
+    }
+
+    function closeMed() {
+      closeDialog("med-backdrop");
+    }
+
+    function moscowDateKey(date) {
+      const parts = moscowParts(date);
+      return parts.year + "-" + parts.month + "-" + parts.day;
+    }
+
+    function formatRuDate(iso) {
+      const pieces = iso.split("-");
+      return pieces[2] + "." + pieces[1] + "." + pieces[0];
+    }
+
+    function inDateRange(key, start, end) {
+      return key >= start && key <= end;
+    }
+
+    function renderCalendar() {
+      const todayKey = moscowDateKey(new Date());
+      const termsBody = document.getElementById("cal-terms");
+      const holidaysBody = document.getElementById("cal-holidays");
+      const status = document.getElementById("cal-status");
+      termsBody.innerHTML = "";
+      holidaysBody.innerHTML = "";
+
+      let currentTerm = null;
+      let currentHoliday = null;
+
+      CAL_TERMS.forEach((term) => {
+        const tr = document.createElement("tr");
+        const isNow = inDateRange(todayKey, term.start, term.end);
+        if (isNow) {
+          tr.className = "today";
+          currentTerm = term;
+        }
+        tr.innerHTML =
+          "<td>" + term.name + "</td>" +
+          "<td>" + formatRuDate(term.start) + "</td>" +
+          "<td>" + formatRuDate(term.end) + "</td>" +
+          "<td>" + term.length + "</td>";
+        termsBody.appendChild(tr);
+      });
+
+      CAL_HOLIDAYS.forEach((holiday) => {
+        const tr = document.createElement("tr");
+        const isNow = inDateRange(todayKey, holiday.start, holiday.end);
+        if (isNow) {
+          tr.className = "today";
+          currentHoliday = holiday;
+        }
+        tr.innerHTML =
+          "<td>" + holiday.name + "</td>" +
+          "<td>" + formatRuDate(holiday.start) + "</td>" +
+          "<td>" + formatRuDate(holiday.end) + "</td>" +
+          "<td>" + formatRuDate(holiday.back) + "</td>" +
+          "<td>" + holiday.length + "</td>";
+        holidaysBody.appendChild(tr);
+      });
+
+      if (currentHoliday) {
+        status.textContent = "Сейчас по Москве: " + currentHoliday.name.toLowerCase() + " каникулы.";
+      } else if (currentTerm) {
+        status.textContent = "Сейчас по Москве: " + currentTerm.name.toLowerCase() + " четверть.";
+      } else {
+        status.textContent = "Сейчас каникулы или учебный год ещё не идёт.";
+      }
+    }
+
+    function renderClassList() {
+      const body = document.getElementById("class-body");
+      body.innerHTML = "";
+      CLASSMATES.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        const numCell = document.createElement("td");
+        numCell.textContent = String(index + 1);
+        const childCell = document.createElement("td");
+        childCell.textContent = row.child;
+        const parentCell = document.createElement("td");
+        parentCell.textContent = row.parent;
+        const cityCell = document.createElement("td");
+        cityCell.textContent = row.city;
+        tr.appendChild(numCell);
+        tr.appendChild(childCell);
+        tr.appendChild(parentCell);
+        tr.appendChild(cityCell);
+        body.appendChild(tr);
+      });
+    }
+
+    function openClass() {
+      renderClassList();
+      openDialog("class-backdrop");
+    }
+
+    function closeClass() {
+      closeDialog("class-backdrop");
+    }
+
+    function openCal() {
+      renderCalendar();
+      openDialog("cal-backdrop");
+    }
+
+    function closeCal() {
+      closeDialog("cal-backdrop");
+    }
+
+    function openMemo() {
+      openDialog("memo-backdrop");
+    }
+
+    function closeMemo() {
+      closeDialog("memo-backdrop");
+    }
+
+    function collectBellsByKind(kind) {
+      const rows = [];
+      for (let i = 0; i < BELLS.length; i += 1) {
+        const bell = BELLS[i];
+        if (bell.kind !== kind) {
+          continue;
+        }
+        const num = kind === "lesson" ? bell.lesson : bell.extra;
+        rows.push({
+          num: num,
+          start: bell.start,
+          end: bell.end
+        });
+      }
+      return rows;
+    }
+
+    function periodSubject(kind, weekday, num) {
+      if (weekday === 6 && kind === "lesson" && num > 5) {
+        return "";
+      }
+      if (weekday === 6 && kind === "extra") {
+        return "";
+      }
+      if (kind === "lesson") {
+        const dayLessons = LESSONS[weekday] || [];
+        return dayLessons[num - 1] || "";
+      }
+      const dayExtras = EXTRAS[weekday] || [];
+      return dayExtras[num - 1] || "";
+    }
+
+    function isCurrentWeekCell(kind, weekday, start, end, nowWeekday, nowMin) {
+      if (weekday !== nowWeekday) {
+        return false;
+      }
+      const startMin = minutesFromHHMM(start);
+      const endMin = minutesFromHHMM(end);
+      return nowMin >= startMin && nowMin < endMin;
+    }
+
+    function appendWeekPeriodRows(tbody, rows, kind, weekdays, nowWeekday, nowMin) {
+      for (let r = 0; r < rows.length; r += 1) {
+        const row = rows[r];
+        const tr = document.createElement("tr");
+        const numCell = document.createElement("th");
+        numCell.className = "week-num";
+        const label = kind === "lesson" ? "Урок " + row.num : "Доп " + row.num;
+        numCell.appendChild(document.createTextNode(label));
+        const time = document.createElement("span");
+        time.className = "week-time";
+        time.textContent = row.start + "–" + row.end;
+        numCell.appendChild(time);
+        tr.appendChild(numCell);
+
+        for (let i = 0; i < weekdays.length; i += 1) {
+          const day = weekdays[i];
+          const subject = periodSubject(kind, day, row.num);
+          const td = document.createElement("td");
+          const classes = [];
+          if (day === nowWeekday) {
+            classes.push("week-today");
+          }
+          const current = isCurrentWeekCell(kind, day, row.start, row.end, nowWeekday, nowMin);
+          if (current && subject) {
+            classes.push("week-now");
+          }
+          if (!subject) {
+            classes.push("week-empty");
+          }
+          td.className = classes.join(" ");
+          td.textContent = subject || "—";
+          tr.appendChild(td);
+        }
+        tbody.appendChild(tr);
+      }
+    }
+
+    function renderWeekTable() {
+      const now = new Date();
+      const nowWeekday = weekdayFromMoscow(now);
+      const nowMin = moscowMinutes(now);
+      const table = document.getElementById("week-table");
+      table.innerHTML = "";
+
+      const lessonRows = collectBellsByKind("lesson");
+      const extraRows = collectBellsByKind("extra");
+      const weekdays = [1, 2, 3, 4, 5, 6];
+
+      const thead = document.createElement("thead");
+      const headRow = document.createElement("tr");
+      const corner = document.createElement("th");
+      corner.className = "week-num";
+      headRow.appendChild(corner);
+
+      for (let i = 0; i < weekdays.length; i += 1) {
+        const day = weekdays[i];
+        const th = document.createElement("th");
+        th.textContent = DAY_LABELS[day];
+        if (day === nowWeekday) {
+          th.className = "week-today";
+        }
+        headRow.appendChild(th);
+      }
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      appendWeekPeriodRows(tbody, lessonRows, "lesson", weekdays, nowWeekday, nowMin);
+
+      const sectionRow = document.createElement("tr");
+      sectionRow.className = "week-section";
+      const sectionCell = document.createElement("td");
+      sectionCell.colSpan = 7;
+      sectionCell.textContent = "Дополнительные занятия";
+      sectionRow.appendChild(sectionCell);
+      tbody.appendChild(sectionRow);
+
+      appendWeekPeriodRows(tbody, extraRows, "extra", weekdays, nowWeekday, nowMin);
+      table.appendChild(tbody);
+    }
+
+    function refreshWeekTableIfOpen() {
+      const backdrop = document.getElementById("week-backdrop");
+      if (!backdrop.classList.contains("open")) {
+        return;
+      }
+      renderWeekTable();
+    }
+
+    function openWeek() {
+      renderWeekTable();
+      openDialog("week-backdrop");
+    }
+
+    function closeWeek() {
+      closeDialog("week-backdrop");
+    }
+
+    document.getElementById("med-open").addEventListener("click", openMed);
+    document.getElementById("med-close").addEventListener("click", closeMed);
+    document.getElementById("med-backdrop").addEventListener("click", (event) => {
+      if (event.target.id === "med-backdrop") {
+        closeMed();
+      }
+    });
+    function applicationDocHtml() {
+      return '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">' +
+        "<head><meta charset=\"utf-8\"><title>Заявление</title>" +
+        "<style>body{font-family:'Times New Roman',Times,serif;font-size:14pt;line-height:1.45}" +
+        ".right{width:55%;margin-left:auto}.line{border-bottom:1px solid #000;min-height:22px;margin:8px 0 2px}" +
+        ".hint{font-size:11pt;text-align:center}.title{text-align:center;font-size:16pt;font-weight:bold;margin:36px 0 24px}" +
+        ".center{text-align:center}.mt{margin-top:18px}</style></head><body>" +
+        "<div class=\"right\">Директору ГАОУ «Лицей Иннополис»<br>А.А. Костаняну" +
+        "<div class=\"line\"></div><div class=\"hint\">(Ф.И.О. законного представителя)</div>" +
+        "<div class=\"line\"></div><div class=\"line\"></div>" +
+        "<div class=\"mt\">адрес проживания</div><div class=\"line\"></div><div class=\"line\"></div>" +
+        "<div class=\"mt\">тел.:</div><div class=\"line\"></div></div>" +
+        "<div class=\"title\">Заявление</div>" +
+        "<p>Я, ________________________________________________________________</p>" +
+        "<p class=\"center hint\">(Ф.И.О. законного представителя ребёнка)</p>" +
+        "<p>Прошу Вас отпустить моего ребёнка,</p><div class=\"line\"></div>" +
+        "<p class=\"center hint\">(Ф.И.О.)</p>" +
+        "<p>ученика(цу) ____________________ класса с ____________________<br>" +
+        "«____» ______________ 20____ г. по «____» ______________ 20____ г.</p>" +
+        "<p class=\"mt\">Ответственность за жизнь и здоровье ребёнка беру на себя.</p>" +
+        "<p class=\"mt\">«____» ______________ 20____ г. ______________________________</p>" +
+        "<p class=\"center hint\">подпись / расшифровка подписи</p></body></html>";
+    }
+
+    function downloadApplication() {
+      const html = applicationDocHtml();
+      const blob = new Blob(["\ufeff", html], { type: "application/msword" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "zayavlenie.doc";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById("doc-download").addEventListener("click", downloadApplication);
+    document.getElementById("class-open").addEventListener("click", openClass);
+    document.getElementById("class-close").addEventListener("click", closeClass);
+    document.getElementById("class-backdrop").addEventListener("click", (event) => {
+      if (event.target.id === "class-backdrop") {
+        closeClass();
+      }
+    });
+    document.getElementById("cal-open").addEventListener("click", openCal);
+    document.getElementById("cal-close").addEventListener("click", closeCal);
+    document.getElementById("cal-backdrop").addEventListener("click", (event) => {
+      if (event.target.id === "cal-backdrop") {
+        closeCal();
+      }
+    });
+    document.getElementById("memo-open").addEventListener("click", openMemo);
+    document.getElementById("memo-close").addEventListener("click", closeMemo);
+    document.getElementById("memo-backdrop").addEventListener("click", (event) => {
+      if (event.target.id === "memo-backdrop") {
+        closeMemo();
+      }
+    });
+    document.getElementById("week-open").addEventListener("click", openWeek);
+    document.getElementById("week-close").addEventListener("click", closeWeek);
+    document.getElementById("week-backdrop").addEventListener("click", (event) => {
+      if (event.target.id === "week-backdrop") {
+        closeWeek();
+      }
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closeMed();
+        closeMemo();
+        closeCal();
+        closeClass();
+        closeWeek();
+      }
+    });
+
+    function startTicker() {
+      tick();
+      const nowMs = Date.now();
+      const msToNextMinute = 60000 - (nowMs % 60000);
+      setTimeout(() => {
+        tick();
+        setInterval(tick, 60000);
+      }, msToNextMinute);
+    }
+
+    startTicker();
+  </script>
+</body>
+</html>
