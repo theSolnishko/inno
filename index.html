@@ -209,6 +209,7 @@
       margin: 0 0 6px;
       font-size: 1.55rem;
       letter-spacing: 0.02em;
+      cursor: pointer;
     }
 
     .sub {
@@ -2076,6 +2077,15 @@
         setInterval(tick, 60000);
       }, msToNextMinute);
     }
+
+    function clearPageAnchors() {
+      const path = location.pathname + location.search;
+      history.replaceState(null, "", path);
+      window.scrollTo(0, 0);
+    }
+
+    const pageTitle = document.querySelector("h1");
+    pageTitle.addEventListener("click", clearPageAnchors);
 
     startTicker();
   </script>
