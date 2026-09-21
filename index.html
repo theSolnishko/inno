@@ -5,6 +5,169 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f6f3ec">
   <title>Расписание 7а</title>
+  <script>
+    /* 7а */
+
+    const CLASS_TEACHER = {
+      name: "Камалетдинова Марина Вячеславовна",
+      url: "https://edu.tatar.ru/v_uslon/page2756795.htm/page3370873.htm"
+    };
+    const EDUCATORS = [
+      {
+        name: "Степанов Александр Васильевич",
+        url: "https://edu.tatar.ru/v_uslon/page2756795.htm/page5258964.htm"
+      },
+      {
+        name: "Быченко Елена Евгеньевна",
+        url: "https://edu.tatar.ru/v_uslon/page2756795.htm/page5258958.htm"
+      },
+      { name: "Владислав Андреевич" }
+    ];
+    const CLASSMATES = [
+      { child: "Алексеев Алексей Николаевич", parent: "Емельянова Татьяна Петровна", city: "Канаш" },
+      { child: "Верещагин Лев Антонович", parent: "Верещагина Анна Викторовна", city: "Новосибирск" },
+      { child: "Закиев Камиль Василевич", parent: "Закиева Евгения Алексеевна", city: "Иннополис" },
+      { child: "Зимин Егор Александрович", parent: "Зимина Марина Валерьевна", city: "Иннополис" },
+      { child: "Ибатуллина София Айратовна", parent: "Бережная Мария Рашидовна", city: "Казань" },
+      { child: "Иванов Олег Сергеевич", parent: "Иванова Виктория Сергеевна", city: "Иннополис" },
+      { child: "Курманова Аделия Маратовна", parent: "Курманова Анастасия Константиновна", city: "Казань" },
+      { child: "Миркасимов Вильдан Мирзагитович", parent: "Миркасимова Наргиз Ибрагимовна", city: "Бугульма" },
+      { child: "Печерская Дарья Андреевна", parent: "Печерская Татьяна Александровна", city: "Зеленодольск" },
+      { child: "Рахматуллин Альфир Артурович", parent: "Рахматуллина Амина Рауфовна", city: "Казань" },
+      { child: "Садреддинов Рашид Ханбаба оглы", parent: "Асадова Гюльмира Агамурад кызы", city: "Ярославль" },
+      { child: "Салина Виктория Николаевна", parent: "Сабирова Гульфия Минихатовна", city: "Казань" },
+      { child: "Усманов Артём Маратович", parent: "Подоплеловы Анна Леонидовна", city: "Йошкар-Ола" },
+      { child: "Хайруллов Тимур Робертович", parent: "Хайруллова Юлия Владимировна", city: "Казань" }
+    ];
+
+    const LESSONS = {
+      0: ["Разговор о важном", "Английский язык", "Английский язык", "Физика", "Музыка", "Физ-ра"],
+      1: ["География", "Физика", "Родной язык", "Алгебра", "Алгебра", "Русский язык"],
+      2: ["Родной язык", "Алгебра", "Геометрия", "География", "Русский язык", "Литература"],
+      3: ["Информатика", "Информатика", "Алгебра", "Английский язык", "ИЗО", "История"],
+      4: ["Русский язык", "Биология", "История", "Физика", "Геометрия", "Родная литература"],
+      5: ["Физ-ра", "Русский язык", "Литература", "ВиС", "История"]
+    };
+
+    const EXTRAS = {
+      0: ["Информатика", "Робототехника", "ИБ"],
+      1: ["Олимпиадная физика (2.4)", "Я — лицеист", "НТО"],
+      2: ["Олимпиадная математика 3.11/3.4, Шубин Г.К., Костанян А.А.", "Олимпиадная математика 3.11/3.4, Шубин Г.К., Костанян А.А.", "ИСИИ"],
+      3: ["Программирование 2.8/2.9, Ишимбаев А.Н., Т-банк", "Программирование 2.8/2.9, Ишимбаев А.Н., Т-банк", "Программирование 2.8/2.9, Ишимбаев А.Н., Т-банк"],
+      4: ["Технология", "Технология", "Классный час"]
+    };
+
+    /* Лицей / интернат */
+
+    const MOSCOW = "Europe/Moscow";
+    const DAY_LABELS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+    const DAY_FULL = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
+    const MEAL_TITLES = ["Завтрак", "Обед / прогулка", "Полдник", "Ужин", "Второй ужин"];
+    const KIND_LABEL = {
+      lesson: "Урок",
+      extra: "Доп. занятие",
+      regime: "Режим дня",
+      break: "Пауза"
+    };
+
+    const BELLS = [
+      { start: "07:00", end: "07:02", kind: "regime", title: "Подъём" },
+      { start: "07:02", end: "07:10", kind: "regime", title: "Зарядка" },
+      { start: "07:10", end: "07:25", kind: "regime", title: "Личная гигиена", note: "Умыться, почистить зубы, принять душ" },
+      { start: "07:25", end: "07:30", kind: "regime", title: "Уборка места", note: "Заправить постель, навести порядок в тумбочке и на полке" },
+      { start: "07:30", end: "07:45", kind: "regime", title: "Телефоны и подготовка к занятиям", note: "Получение телефонов в воспитательской. Одеть форму, собрать в рюкзак учебники, тетради и принадлежности" },
+      { start: "07:45", end: "07:55", kind: "regime", title: "Сдача телефонов, уход на занятия", note: "Интернат закрывается" },
+      { start: "07:55", end: "08:00", kind: "break", title: "Переход к занятиям" },
+      { start: "08:00", end: "08:40", kind: "lesson", lesson: 1 },
+      { start: "08:40", end: "09:00", kind: "regime", title: "Завтрак", note: "По расписанию лицея" },
+      { start: "09:00", end: "09:40", kind: "lesson", lesson: 2 },
+      { start: "09:40", end: "09:50", kind: "break", title: "Перемена" },
+      { start: "09:50", end: "10:30", kind: "lesson", lesson: 3 },
+      { start: "10:30", end: "10:40", kind: "break", title: "Перемена" },
+      { start: "10:40", end: "11:20", kind: "lesson", lesson: 4 },
+      { start: "11:20", end: "11:30", kind: "break", title: "Перемена" },
+      { start: "11:30", end: "12:10", kind: "lesson", lesson: 5 },
+      { start: "12:10", end: "12:20", kind: "break", title: "Перемена" },
+      { start: "12:20", end: "13:00", kind: "regime", title: "Обед / прогулка", note: "По расписанию лицея" },
+      { start: "13:00", end: "13:40", kind: "lesson", lesson: 6 },
+      { start: "13:40", end: "14:00", kind: "break", title: "Перерыв" },
+      { start: "14:00", end: "14:40", kind: "extra", extra: 1 },
+      { start: "14:40", end: "14:50", kind: "break", title: "Перемена" },
+      { start: "14:50", end: "15:30", kind: "extra", extra: 2 },
+      { start: "15:30", end: "15:50", kind: "regime", title: "Полдник" },
+      { start: "15:50", end: "16:30", kind: "extra", extra: 3, extraFallback: "Самоподготовка" },
+      { start: "16:30", end: "16:55", kind: "regime", title: "Получение телефонов", note: "Переодеться, разместить учебные вещи в комнате" },
+      { start: "16:55", end: "17:00", kind: "break", title: "Перерыв" },
+      { start: "17:00", end: "17:30", kind: "regime", title: "Ужин" },
+      { start: "17:30", end: "18:25", kind: "regime", title: "Прогулка по городу", note: "7 класс — в сопровождении воспитателя. 10–11 класс — с разрешения, без сопровождения, запись в журнале" },
+      { start: "18:25", end: "18:30", kind: "break", title: "Перерыв" },
+      { start: "18:30", end: "20:20", kind: "regime", title: "Самоподготовка", note: "Все находятся в закреплённых аудиториях" },
+      { start: "20:20", end: "20:40", kind: "regime", title: "Второй ужин" },
+      { start: "20:40", end: "21:40", kind: "regime", title: "Прогулка / отдых, кружки и секции", note: "Прогулка на территории лицея с разрешения воспитателя" },
+      { start: "21:40", end: "22:00", kind: "regime", title: "Свободное время" },
+      { start: "22:00", end: "22:05", kind: "regime", title: "Сдача телефонов", note: "Будильник на телефонах отключить" },
+      { start: "22:05", end: "22:25", kind: "regime", title: "Подготовка ко сну, личная гигиена", note: "Умыться, почистить зубы, принять душ, приготовить постель, набрать воды, погладить одежду, почистить обувь, высушить волосы, снять линзы, проверить витамины" },
+      { start: "22:25", end: "22:30", kind: "break", title: "К отбою" },
+      { start: "22:30", end: "24:00", kind: "regime", title: "Отбой", note: "Все в кровати. Передвижение по комнатам и коридору запрещено" }
+    ];
+
+    const MED_DAYS = [
+      { day: 0, doctor: "14:30–20:30", nurse: "07:30–13:30" },
+      { day: 1, doctor: "07:30–13:30", nurse: "14:30–20:30" },
+      { day: 2, doctor: "14:30–20:30", nurse: "07:30–13:30" },
+      { day: 3, doctor: "07:30–13:30", nurse: "14:30–20:30" },
+      { day: 4, doctor: "14:30–20:30", nurse: "07:30–13:30" },
+      { day: 5, doctor: "07:30–12:00", nurse: "по графику", saturday: true }
+    ];
+
+    const MED_PHONES = [];
+
+    const CAL_INTRO = "ГАОУ «Лицей Иннополис», 2026–2027 учебный год. Учебный год делится на четверти.";
+    const CAL_TERMS = [
+      { name: "Первая", start: "2026-09-01", end: "2026-10-30", length: "9 недель" },
+      { name: "Вторая", start: "2026-11-09", end: "2026-12-28", length: "7 недель" },
+      { name: "Третья", start: "2027-01-11", end: "2027-03-26", length: "11 недель" },
+      { name: "Четвёртая", start: "2027-04-05", end: "2027-05-26", length: "7 недель" }
+    ];
+    const CAL_HOLIDAYS = [
+      { name: "Осенние", start: "2026-10-31", end: "2026-11-08", back: "2026-11-09", length: "9 календарных дней с учётом праздничных дней" },
+      { name: "Зимние", start: "2026-12-29", end: "2027-01-10", back: "2027-01-11", length: "13 календарных дней" },
+      { name: "Весенние", start: "2027-03-27", end: "2027-04-04", back: "2027-04-05", length: "9 календарных дней" }
+    ];
+
+    const STAFF_LINK = {
+      label: "Все педагоги лицея",
+      url: "https://edu.tatar.ru/v_uslon/page2756795.htm/page2809806.htm"
+    };
+
+    const FOOD_INTRO = "Памятка по питанию воспитанников в интернате при ГАОУ «Лицей Иннополис». Воспитанники обеспечиваются пятиразовым питанием: завтрак, второй завтрак, обед, полдник, ужин. При необходимости родители могут давать продукты, разрешённые для хранения и употребления в интернате.";
+    const FOOD_ALLOWED = [
+      "Печенье",
+      "Соки (упаковки не более 0,5 л)",
+      "Негазированные напитки",
+      "Шоколад и сладости (в умеренном количестве)",
+      "Вода",
+      "Фрукты: свежие бананы, яблоки, цитрусовые, не более 1 кг",
+      "Орехи (кроме арахиса)",
+      "Мёд"
+    ];
+    const FOOD_FORBIDDEN = [
+      "Молочные и кисломолочные продукты",
+      "Копчёности",
+      "Колбасы",
+      "Мясные и рыбные консервы",
+      "Салаты",
+      "Майонез, кетчуп, соусы",
+      "Выпечка: домашние пироги, пицца, торты и т.п.",
+      "Фрукты: виноград, киви, груша, ягоды",
+      "Маринованные изделия",
+      "Чипсы, сухарики, семечки, попкорн",
+      "Сухие супы быстрого приготовления: лапша, пюре, каши и т.д.",
+      "Лапша быстрого приготовления",
+      "Газированные напитки, кофе"
+    ];
+    const FOOD_NOTE = "Запрещённые продукты, принесённые в лицей, будут изыматься.";
+  </script>
   <style>
     :root {
       --bg: #f6f3ec;
@@ -557,25 +720,12 @@
     <div class="contacts-row">
       <section class="card educators">
         <div class="clock-label">Классный руководитель</div>
-        <div class="educators-list">
-          <div class="person">
-            <a class="chip chip-profile" href="https://edu.tatar.ru/v_uslon/page2756795.htm/page3370873.htm" target="_blank" rel="noopener">Камалетдинова Марина Вячеславовна</a>
-          </div>
-        </div>
-        <div class="staff-link">
-          <a class="chip chip-staff" href="https://edu.tatar.ru/v_uslon/page2756795.htm/page2809806.htm" target="_blank" rel="noopener">Все педагоги лицея</a>
-        </div>
+        <div id="teacher-list" class="educators-list"></div>
+        <div id="staff-link" class="staff-link"></div>
       </section>
       <section class="card educators">
         <div class="clock-label">Воспитатели</div>
-        <div class="educators-list">
-          <div class="person">
-            <a class="chip chip-profile" href="https://edu.tatar.ru/v_uslon/page2756795.htm/page5258964.htm" target="_blank" rel="noopener">Степанов Александр Васильевич</a>
-          </div>
-          <div class="person">
-            <span class="person-name">Владислав Андреевич</span>
-          </div>
-        </div>
+        <div id="educators-list" class="educators-list"></div>
       </section>
     </div>
 
@@ -601,6 +751,7 @@
         </thead>
         <tbody id="med-body"></tbody>
       </table>
+      <p id="med-phones" class="med-phones"></p>
     </div>
   </div>
 
@@ -630,10 +781,7 @@
         <h2 id="cal-title">Календарный учебный график</h2>
         <button type="button" id="cal-close" class="med-close" aria-label="Закрыть">×</button>
       </div>
-      <p class="memo-text">
-        ГАОУ «Лицей Иннополис», 2026–2027 учебный год.
-        Учебный год делится на четверти.
-      </p>
+      <p id="cal-intro" class="memo-text"></p>
       <p class="cal-caption">Таблица 1. Границы учебных четвертей</p>
       <table class="med-table">
         <thead>
@@ -669,43 +817,16 @@
         <h2 id="memo-title">Памятка по питанию</h2>
         <button type="button" id="memo-close" class="med-close" aria-label="Закрыть">×</button>
       </div>
-      <p class="memo-text">
-        Памятка по питанию воспитанников в интернате при ГАОУ «Лицей Иннополис».
-        Воспитанники обеспечиваются пятиразовым питанием: завтрак, второй завтрак, обед, полдник, ужин.
-        При необходимости родители могут давать продукты, разрешённые для хранения и употребления в интернате.
-      </p>
+      <p id="memo-intro" class="memo-text"></p>
       <div class="memo-block">
         <h3>Можно</h3>
-        <ul>
-          <li>Печенье</li>
-          <li>Соки (упаковки не более 0,5 л)</li>
-          <li>Негазированные напитки</li>
-          <li>Шоколад и сладости (в умеренном количестве)</li>
-          <li>Вода</li>
-          <li>Фрукты: свежие бананы, яблоки, цитрусовые, не более 1 кг</li>
-          <li>Орехи (кроме арахиса)</li>
-          <li>Мёд</li>
-        </ul>
+        <ul id="memo-allowed"></ul>
       </div>
       <div class="memo-block memo-forbid">
         <h3>Категорически запрещается</h3>
-        <ul>
-          <li>Молочные и кисломолочные продукты</li>
-          <li>Копчёности</li>
-          <li>Колбасы</li>
-          <li>Мясные и рыбные консервы</li>
-          <li>Салаты</li>
-          <li>Майонез, кетчуп, соусы</li>
-          <li>Выпечка: домашние пироги, пицца, торты и т.п.</li>
-          <li>Фрукты: виноград, киви, груша, ягоды</li>
-          <li>Маринованные изделия</li>
-          <li>Чипсы, сухарики, семечки, попкорн</li>
-          <li>Сухие супы быстрого приготовления: лапша, пюре, каши и т.д.</li>
-          <li>Лапша быстрого приготовления</li>
-          <li>Газированные напитки, кофе</li>
-        </ul>
+        <ul id="memo-forbidden"></ul>
       </div>
-      <p class="memo-text">Запрещённые продукты, принесённые в лицей, будут изыматься.</p>
+      <p id="memo-note" class="memo-text"></p>
     </div>
   </div>
 
@@ -723,113 +844,6 @@
   </div>
 
   <script>
-    const MOSCOW = "Europe/Moscow";
-    const DAY_LABELS = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
-    const DAY_FULL = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
-
-    const LESSONS = {
-      1: ["Разговор о важном", "Английский язык", "Английский язык", "Физика", "Музыка", "Физ-ра"],
-      2: ["География", "Физика", "Родной язык", "Алгебра", "Алгебра", "Русский язык"],
-      3: ["Родной язык", "Алгебра", "Геометрия", "География", "Русский язык", "Литература"],
-      4: ["Информатика", "Информатика", "Алгебра", "Английский язык", "ИЗО", "История"],
-      5: ["Русский язык", "Биология", "История", "Физика", "Геометрия", "Родная литература"],
-      6: ["Физ-ра", "Русский язык", "Литература", "ВиС", "История"]
-    };
-
-    const EXTRAS = {
-      1: ["Информатика", "Робототехника", "ИБ"],
-      2: ["Олимпиадная физика (2.4)", "Я — лицеист", "НТО"],
-      3: ["Олимпиадная математика 3.11/3.4, Шубин Г.К., Костанян А.А.", "Олимпиадная математика 3.11/3.4, Шубин Г.К., Костанян А.А.", "ИСИИ"],
-      4: ["Программирование 2.8/2.9, Ишимбаев А.Н., Т-банк", "Программирование 2.8/2.9, Ишимбаев А.Н., Т-банк", "Программирование 2.8/2.9, Ишимбаев А.Н., Т-банк"],
-      5: ["Технология", "Технология", "Классный час"]
-    };
-
-    const BELLS = [
-      { start: "07:00", end: "07:02", kind: "regime", title: "Подъём" },
-      { start: "07:02", end: "07:10", kind: "regime", title: "Зарядка" },
-      { start: "07:10", end: "07:25", kind: "regime", title: "Личная гигиена", note: "Умыться, почистить зубы, принять душ" },
-      { start: "07:25", end: "07:30", kind: "regime", title: "Уборка места", note: "Заправить постель, навести порядок в тумбочке и на полке" },
-      { start: "07:30", end: "07:45", kind: "regime", title: "Телефоны и подготовка к занятиям", note: "Получение телефонов в воспитательской. Одеть форму, собрать в рюкзак учебники, тетради и принадлежности" },
-      { start: "07:45", end: "07:55", kind: "regime", title: "Сдача телефонов, уход на занятия", note: "Интернат закрывается" },
-      { start: "07:55", end: "08:00", kind: "break", title: "Переход к занятиям" },
-      { start: "08:00", end: "08:40", kind: "lesson", lesson: 1 },
-      { start: "08:40", end: "09:00", kind: "regime", title: "Завтрак", note: "По расписанию лицея" },
-      { start: "09:00", end: "09:40", kind: "lesson", lesson: 2 },
-      { start: "09:40", end: "09:50", kind: "break", title: "Перемена" },
-      { start: "09:50", end: "10:30", kind: "lesson", lesson: 3 },
-      { start: "10:30", end: "10:40", kind: "break", title: "Перемена" },
-      { start: "10:40", end: "11:20", kind: "lesson", lesson: 4 },
-      { start: "11:20", end: "11:30", kind: "break", title: "Перемена" },
-      { start: "11:30", end: "12:10", kind: "lesson", lesson: 5 },
-      { start: "12:10", end: "12:20", kind: "break", title: "Перемена" },
-      { start: "12:20", end: "13:00", kind: "regime", title: "Обед / прогулка", note: "По расписанию лицея" },
-      { start: "13:00", end: "13:40", kind: "lesson", lesson: 6 },
-      { start: "13:40", end: "14:00", kind: "break", title: "Перерыв" },
-      { start: "14:00", end: "14:40", kind: "extra", extra: 1 },
-      { start: "14:40", end: "14:50", kind: "break", title: "Перемена" },
-      { start: "14:50", end: "15:30", kind: "extra", extra: 2 },
-      { start: "15:30", end: "15:50", kind: "regime", title: "Полдник" },
-      { start: "15:50", end: "16:30", kind: "extra", extra: 3, extraFallback: "Самоподготовка" },
-      { start: "16:30", end: "16:55", kind: "regime", title: "Получение телефонов", note: "Переодеться, разместить учебные вещи в комнате" },
-      { start: "16:55", end: "17:00", kind: "break", title: "Перерыв" },
-      { start: "17:00", end: "17:30", kind: "regime", title: "Ужин" },
-      { start: "17:30", end: "18:25", kind: "regime", title: "Прогулка по городу", note: "7 класс — в сопровождении воспитателя. 10–11 класс — с разрешения, без сопровождения, запись в журнале" },
-      { start: "18:25", end: "18:30", kind: "break", title: "Перерыв" },
-      { start: "18:30", end: "20:20", kind: "regime", title: "Самоподготовка", note: "Все находятся в закреплённых аудиториях" },
-      { start: "20:20", end: "20:40", kind: "regime", title: "Второй ужин" },
-      { start: "20:40", end: "21:40", kind: "regime", title: "Прогулка / отдых, кружки и секции", note: "Прогулка на территории лицея с разрешения воспитателя" },
-      { start: "21:40", end: "22:00", kind: "regime", title: "Свободное время" },
-      { start: "22:00", end: "22:05", kind: "regime", title: "Сдача телефонов", note: "Будильник на телефонах отключить" },
-      { start: "22:05", end: "22:25", kind: "regime", title: "Подготовка ко сну, личная гигиена", note: "Умыться, почистить зубы, принять душ, приготовить постель, набрать воды, погладить одежду, почистить обувь, высушить волосы, снять линзы, проверить витамины" },
-      { start: "22:25", end: "22:30", kind: "break", title: "К отбою" },
-      { start: "22:30", end: "24:00", kind: "regime", title: "Отбой", note: "Все в кровати. Передвижение по комнатам и коридору запрещено" }
-    ];
-
-    const MED_DAYS = [
-      { day: 1, doctor: "14:30–20:30", nurse: "07:30–13:30" },
-      { day: 2, doctor: "07:30–13:30", nurse: "14:30–20:30" },
-      { day: 3, doctor: "14:30–20:30", nurse: "07:30–13:30" },
-      { day: 4, doctor: "07:30–13:30", nurse: "14:30–20:30" },
-      { day: 5, doctor: "14:30–20:30", nurse: "07:30–13:30" },
-      { day: 6, doctor: "07:30–12:00", nurse: "по графику", saturday: true }
-    ];
-
-    const CLASSMATES = [
-      { child: "Верещагин Лев Антонович", parent: "Верещагина Анна Викторовна", city: "Новосибирск" },
-      { child: "Рахматуллин Альфир Артурович", parent: "Рахматуллина Амина Рауфовна", city: "Казань" },
-      { child: "Печерская Дарья Андреевна", parent: "Печерская Татьяна Александровна", city: "Зеленодольск" },
-      { child: "Салина Виктория Николаевна", parent: "Сабирова Гульфия Минихатовна", city: "Казань" },
-      { child: "Усманов Артём Маратович", parent: "Подоплеловы Анна Леонидовна", city: "Йошкар-Ола" },
-      { child: "Ибатуллина София Айратовна", parent: "Бережная Мария Рашидовна", city: "Казань" },
-      { child: "Алексеев Алексей Николаевич", parent: "Емельянова Татьяна Петровна", city: "Канаш" },
-      { child: "Иванов Олег Сергеевич", parent: "Иванова Виктория Сергеевна", city: "Иннополис" },
-      { child: "Садреддинов Рашид Ханбаба оглы", parent: "Асадова Гюльмира Агамурад кызы", city: "Ярославль" },
-      { child: "Хайруллов Тимур Робертович", parent: "Хайруллова Юлия Владимировна", city: "Казань" },
-      { child: "Зимин Егор Александрович", parent: "Зимина Марина Валерьевна", city: "Иннополис" },
-      { child: "Закиев Камиль Василевич", parent: "Закиева Евгения Алексеевна", city: "Иннополис" },
-      { child: "Миркасимов Вильдан Мирзагитович", parent: "Миркасимова Наргиз Ибрагимовна", city: "Бугульма" },
-      { child: "Курманова Аделия Маратовна", parent: "Курманова Анастасия Константиновна", city: "Казань" }
-    ];
-
-    const CAL_TERMS = [
-      { name: "Первая", start: "2026-09-01", end: "2026-10-30", length: "9 недель" },
-      { name: "Вторая", start: "2026-11-09", end: "2026-12-28", length: "7 недель" },
-      { name: "Третья", start: "2027-01-11", end: "2027-03-26", length: "11 недель" },
-      { name: "Четвёртая", start: "2027-04-05", end: "2027-05-26", length: "7 недель" }
-    ];
-
-    const CAL_HOLIDAYS = [
-      { name: "Осенние", start: "2026-10-31", end: "2026-11-08", back: "2026-11-09", length: "9 календарных дней с учётом праздничных дней" },
-      { name: "Зимние", start: "2026-12-29", end: "2027-01-10", back: "2027-01-11", length: "13 календарных дней" },
-      { name: "Весенние", start: "2027-03-27", end: "2027-04-04", back: "2027-04-05", length: "9 календарных дней" }
-    ];
-
-    const KIND_LABEL = {
-      lesson: "Урок",
-      extra: "Доп. занятие",
-      regime: "Режим дня",
-      break: "Пауза"
-    };
 
     let selectedWeekday = null;
     const localZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -865,6 +879,30 @@
 
       const map = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
       return map[weekday];
+    }
+
+    function mondayIndex(jsWeekday) {
+      return (jsWeekday + 6) % 7;
+    }
+
+    function dayLabel(jsWeekday) {
+      const index = mondayIndex(jsWeekday);
+      return DAY_LABELS[index];
+    }
+
+    function dayFull(jsWeekday) {
+      const index = mondayIndex(jsWeekday);
+      return DAY_FULL[index];
+    }
+
+    function lessonsForDay(jsWeekday) {
+      const index = mondayIndex(jsWeekday);
+      return LESSONS[index] || [];
+    }
+
+    function extrasForDay(jsWeekday) {
+      const index = mondayIndex(jsWeekday);
+      return EXTRAS[index] || [];
     }
 
     function minutesFromHHMM(value) {
@@ -955,7 +993,7 @@
 
     function slotTitle(bell, weekday) {
       if (bell.kind === "lesson") {
-        const dayLessons = LESSONS[weekday] || [];
+        const dayLessons = lessonsForDay(weekday);
         const subject = dayLessons[bell.lesson - 1];
         if (!subject) {
           return "Окно";
@@ -964,7 +1002,7 @@
       }
 
       if (bell.kind === "extra") {
-        const dayExtras = EXTRAS[weekday] || [];
+        const dayExtras = extrasForDay(weekday);
         const subject = dayExtras[bell.extra - 1];
         if (subject) {
           return subject;
@@ -980,7 +1018,7 @@
 
     function slotKindLabel(bell, weekday) {
       if (bell.kind === "lesson") {
-        const dayLessons = LESSONS[weekday] || [];
+        const dayLessons = lessonsForDay(weekday);
         const subject = dayLessons[bell.lesson - 1];
         if (!subject) {
           return "Нет урока";
@@ -994,8 +1032,6 @@
 
       return KIND_LABEL[bell.kind];
     }
-
-    const MEAL_TITLES = ["Завтрак", "Обед / прогулка", "Полдник", "Ужин", "Второй ужин"];
 
     function copySlot(slot) {
       return {
@@ -1272,7 +1308,7 @@
     }
 
     function nextSaturdayLessonStart(nowMin) {
-      const dayLessons = LESSONS[6] || [];
+      const dayLessons = lessonsForDay(6);
       for (let i = 0; i < BELLS.length; i += 1) {
         const bell = BELLS[i];
         if (bell.kind !== "lesson") {
@@ -1438,7 +1474,7 @@
       [1, 2, 3, 4, 5, 6, 0].forEach((day) => {
         const button = document.createElement("button");
         button.className = "day-btn" + (day === selectedWeekday ? " active" : "");
-        button.textContent = DAY_LABELS[day];
+        button.textContent = dayLabel(day);
         button.addEventListener("click", () => {
           selectedWeekday = day;
           tick();
@@ -1454,7 +1490,7 @@
       root.innerHTML = "";
       const heading = document.createElement("div");
       heading.className = "sub";
-      heading.textContent = DAY_FULL[weekday] + " · местное и московское время";
+      heading.textContent = dayFull(weekday) + " · местное и московское время";
       root.appendChild(heading);
 
       slots.forEach((slot) => {
@@ -1535,7 +1571,7 @@
         const nowCard = document.getElementById("now-card");
         nowCard.innerHTML =
           dayViewLink("#schedule") +
-          '<h2 class="hero-title">' + DAY_FULL[selectedWeekday] + '</h2>' +
+          '<h2 class="hero-title">' + dayFull(selectedWeekday) + '</h2>' +
           '<p class="hero-meta">Это не сегодня. Ниже полное расписание с местным и московским временем.</p>';
       }
 
@@ -1548,9 +1584,10 @@
       const body = document.getElementById("med-body");
       body.innerHTML = "";
 
+      const todayIndex = mondayIndex(moscowWeekday);
       MED_DAYS.forEach((row) => {
         const tr = document.createElement("tr");
-        if (row.day === moscowWeekday) {
+        if (row.day === todayIndex) {
           tr.className = "today";
         }
 
@@ -1663,6 +1700,103 @@
       }
     }
 
+    function formatPhone(raw) {
+      const digits = raw.replace(/\D/g, "");
+      let normalized = digits;
+      if (normalized.length === 11 && normalized.charAt(0) === "8") {
+        normalized = "7" + normalized.slice(1);
+      }
+      if (normalized.length === 11 && normalized.charAt(0) === "7") {
+        const rest = normalized.slice(1);
+        return {
+          tel: "+" + normalized,
+          text: "+7 " + rest.slice(0, 3) + " " + rest.slice(3, 6) + "-" + rest.slice(6, 8) + "-" + rest.slice(8)
+        };
+      }
+      return { tel: raw, text: raw };
+    }
+
+    function appendPerson(root, person) {
+      const row = document.createElement("div");
+      row.className = "person";
+      if (person.url) {
+        const link = document.createElement("a");
+        link.className = "chip chip-profile";
+        link.href = person.url;
+        link.target = "_blank";
+        link.rel = "noopener";
+        link.textContent = person.name;
+        row.appendChild(link);
+      } else {
+        const name = document.createElement("span");
+        name.className = "person-name";
+        name.textContent = person.name;
+        row.appendChild(name);
+      }
+      if (person.phone) {
+        const phone = formatPhone(person.phone);
+        const tel = document.createElement("a");
+        tel.className = "chip chip-phone";
+        tel.href = "tel:" + phone.tel;
+        tel.textContent = phone.text;
+        row.appendChild(tel);
+      }
+      root.appendChild(row);
+    }
+
+    function fillList(id, items) {
+      const list = document.getElementById(id);
+      list.innerHTML = "";
+      for (let i = 0; i < items.length; i += 1) {
+        const item = document.createElement("li");
+        item.textContent = items[i];
+        list.appendChild(item);
+      }
+    }
+
+    function renderStaticData() {
+      const teacherList = document.getElementById("teacher-list");
+      teacherList.innerHTML = "";
+      appendPerson(teacherList, CLASS_TEACHER);
+
+      const staffLink = document.getElementById("staff-link");
+      staffLink.innerHTML = "";
+      const staff = document.createElement("a");
+      staff.className = "chip chip-staff";
+      staff.href = STAFF_LINK.url;
+      staff.target = "_blank";
+      staff.rel = "noopener";
+      staff.textContent = STAFF_LINK.label;
+      staffLink.appendChild(staff);
+
+      const educatorsList = document.getElementById("educators-list");
+      educatorsList.innerHTML = "";
+      for (let i = 0; i < EDUCATORS.length; i += 1) {
+        appendPerson(educatorsList, EDUCATORS[i]);
+      }
+
+      document.getElementById("cal-intro").textContent = CAL_INTRO;
+      document.getElementById("memo-intro").textContent = FOOD_INTRO;
+      document.getElementById("memo-note").textContent = FOOD_NOTE;
+      fillList("memo-allowed", FOOD_ALLOWED);
+      fillList("memo-forbidden", FOOD_FORBIDDEN);
+
+      const medRoot = document.getElementById("med-phones");
+      medRoot.innerHTML = "";
+      for (let i = 0; i < MED_PHONES.length; i += 1) {
+        const row = MED_PHONES[i];
+        const phone = formatPhone(row.phone);
+        if (i > 0) {
+          medRoot.appendChild(document.createElement("br"));
+        }
+        const link = document.createElement("a");
+        link.href = "tel:" + phone.tel;
+        link.textContent = phone.text;
+        medRoot.appendChild(link);
+        medRoot.appendChild(document.createTextNode(" — " + row.name));
+      }
+    }
+
     function renderClassList() {
       const body = document.getElementById("class-body");
       body.innerHTML = "";
@@ -1735,10 +1869,10 @@
         return "";
       }
       if (kind === "lesson") {
-        const dayLessons = LESSONS[weekday] || [];
+        const dayLessons = lessonsForDay(weekday);
         return dayLessons[num - 1] || "";
       }
-      const dayExtras = EXTRAS[weekday] || [];
+      const dayExtras = extrasForDay(weekday);
       return dayExtras[num - 1] || "";
     }
 
@@ -1808,7 +1942,7 @@
       for (let i = 0; i < weekdays.length; i += 1) {
         const day = weekdays[i];
         const th = document.createElement("th");
-        th.textContent = DAY_LABELS[day];
+        th.textContent = dayLabel(day);
         if (day === nowWeekday) {
           th.className = "week-today";
         }
@@ -1933,6 +2067,7 @@
     });
 
     function startTicker() {
+      renderStaticData();
       tick();
       const nowMs = Date.now();
       const msToNextMinute = 60000 - (nowMs % 60000);
