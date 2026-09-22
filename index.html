@@ -23,13 +23,16 @@
       },
       { name: "Владислав Андреевич" }
     ];
+
     const CLASSMATES = [
+      { child: "Айтжанова Ясмина Сакеновна", parent: "Айтжанова Зульфия Габдельхалимовна", city: "Иннополис" },
       { child: "Алексеев Алексей Николаевич", parent: "Емельянова Татьяна Петровна", city: "Канаш" },
       { child: "Верещагин Лев Антонович", parent: "Верещагина Анна Викторовна", city: "Новосибирск" },
       { child: "Закиев Камиль Василевич", parent: "Закиева Евгения Алексеевна", city: "Иннополис" },
       { child: "Зимин Егор Александрович", parent: "Зимина Марина Валерьевна", city: "Иннополис" },
       { child: "Ибатуллина София Айратовна", parent: "Бережная Мария Рашидовна", city: "Казань" },
       { child: "Иванов Олег Сергеевич", parent: "Иванова Виктория Сергеевна", city: "Иннополис" },
+      { child: "Камалов Тагир Раилевич", parent: "Камалов Раиль Иршатович", city: "Иннополис" },
       { child: "Курманова Аделия Маратовна", parent: "Курманова Анастасия Константиновна", city: "Казань" },
       { child: "Миркасимов Вильдан Мирзагитович", parent: "Миркасимова Наргиз Ибрагимовна", city: "Бугульма" },
       { child: "Печерская Дарья Андреевна", parent: "Печерская Татьяна Александровна", city: "Зеленодольск" },
@@ -110,6 +113,42 @@
       { start: "22:25", end: "22:30", kind: "break", title: "К отбою" },
       { start: "22:30", end: "24:00", kind: "regime", title: "Отбой", note: "Все в кровати. Передвижение по комнатам и коридору запрещено" }
     ];
+
+    const CLUBS = {
+      0: [
+        { start: "19:00", end: "20:30", title: "Подводное плавание", teacher: "Ширяев В.М." },
+        { start: "20:30", end: "21:30", title: "Волейбол", teacher: "Штро М.Н." },
+        { start: "20:30", end: "21:30", title: "Тренажёрный зал (мальчики)", teacher: "Воробьев К.А." },
+        { start: "20:30", end: "21:30", title: "Ансамбль танца", teacher: "Трофимова Л.А." }
+      ],
+      1: [
+        { start: "20:30", end: "21:30", title: "Баскетбол", teacher: "Бурдин И.С." },
+        { start: "20:30", end: "21:30", title: "Тренажёрный зал (девочки)", teacher: "Быченко Е.Е." },
+        { start: "20:30", end: "21:30", title: "Секреты кулинарии", teacher: "Грачева Л.Н., каб. 1.4" },
+        { start: "20:30", end: "21:30", title: "Настольный теннис", teacher: "Воробьев К.А." },
+        { start: "20:30", end: "21:30", title: "Керамика", teacher: "Степанов А.В." }
+      ],
+      2: [
+        { start: "19:00", end: "20:30", title: "Подводное плавание", teacher: "Ширяев В.М." },
+        { start: "20:30", end: "21:30", title: "Футбол", teacher: "Золодин В.В." },
+        { start: "20:30", end: "21:30", title: "Тренажёрный зал (мальчики)", teacher: "Воробьев К.А." },
+        { start: "20:30", end: "21:30", title: "Ансамбль танца", teacher: "Трофимова Л.А." },
+        { start: "20:30", end: "21:30", title: "Клуб патриотической песни", teacher: "Козлова С.А." }
+      ],
+      3: [
+        { start: "20:30", end: "21:30", title: "Баскетбол", teacher: "Бурдин И.С." },
+        { start: "20:30", end: "21:30", title: "Тренажёрный зал (девочки)", teacher: "Быченко Е.Е." },
+        { start: "20:30", end: "21:30", title: "Настольный теннис", teacher: "Воробьев К.А." },
+        { start: "20:30", end: "21:30", title: "Керамика", teacher: "Степанов А.В." },
+        { start: "20:30", end: "21:30", title: "Секреты кулинарии", teacher: "Грачева Л.Н., каб. 1.4" }
+      ],
+      4: [
+        { start: "20:30", end: "21:30", title: "Волейбол", teacher: "Штро М.Н." },
+        { start: "20:30", end: "21:30", title: "Тренажёрный зал (мальчики)", teacher: "Воробьев К.А." },
+        { start: "20:30", end: "21:30", title: "Ансамбль танца", teacher: "Трофимова Л.А." },
+        { start: "20:30", end: "21:30", title: "Клуб патриотической песни", teacher: "Козлова С.А." }
+      ]
+    };
 
     const MED_DAYS = [
       { day: 0, doctor: "14:30–20:30", nurse: "07:30–13:30" },
@@ -682,6 +721,21 @@
     .week-table td.week-empty {
       color: #94a3b8;
     }
+
+    .week-table .club-item {
+      padding: 6px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .week-table .club-item:first-child {
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .week-table .club-teacher {
+      color: var(--muted);
+      font-size: 0.92em;
+    }
   </style>
 </head>
 <body>
@@ -693,6 +747,7 @@
       </div>
       <div class="top-actions">
         <button type="button" id="week-open" class="med-btn">Расписание</button>
+        <button type="button" id="clubs-open" class="med-btn">Кружки</button>
         <button type="button" id="class-open" class="med-btn">Класс</button>
         <button type="button" id="cal-open" class="med-btn">Учебный график</button>
         <button type="button" id="memo-open" class="med-btn">Памятка</button>
@@ -840,6 +895,19 @@
       <p class="cal-note">Время московское. Суббота — до 5-го урока, без допок.</p>
       <div class="week-scroll">
         <table id="week-table" class="week-table"></table>
+      </div>
+    </div>
+  </div>
+
+  <div id="clubs-backdrop" class="med-backdrop" hidden>
+    <div class="med-modal week" role="dialog" aria-modal="true" aria-labelledby="clubs-title">
+      <div class="med-head">
+        <h2 id="clubs-title">Вечерние кружки и секции</h2>
+        <button type="button" id="clubs-close" class="med-close" aria-label="Закрыть">×</button>
+      </div>
+      <p class="cal-note">Время московское. Пн–Пт.</p>
+      <div class="week-scroll">
+        <table id="clubs-table" class="week-table"></table>
       </div>
     </div>
   </div>
@@ -1579,6 +1647,7 @@
       renderDays(moscowWeekday);
       renderTimeline(now, selectedWeekday, viewingToday ? state : { current: null, next: null });
       refreshWeekTableIfOpen();
+      refreshClubsTableIfOpen();
     }
 
     function renderMedTable(moscowWeekday) {
@@ -1984,6 +2053,126 @@
       closeDialog("week-backdrop");
     }
 
+    function clubsForDay(jsWeekday) {
+      const index = mondayIndex(jsWeekday);
+      return CLUBS[index] || [];
+    }
+
+    function clubsForSlot(jsWeekday, start, end) {
+      const dayClubs = clubsForDay(jsWeekday);
+      const matched = [];
+      for (let i = 0; i < dayClubs.length; i += 1) {
+        const club = dayClubs[i];
+        if (club.start === start && club.end === end) {
+          matched.push(club);
+        }
+      }
+      return matched;
+    }
+
+    function appendClubItems(td, clubs) {
+      for (let i = 0; i < clubs.length; i += 1) {
+        const club = clubs[i];
+        const item = document.createElement("div");
+        item.className = "club-item";
+        const title = document.createElement("div");
+        title.textContent = club.title;
+        item.appendChild(title);
+        const teacher = document.createElement("div");
+        teacher.className = "club-teacher";
+        teacher.textContent = club.teacher;
+        item.appendChild(teacher);
+        td.appendChild(item);
+      }
+    }
+
+    function renderClubsTable() {
+      const now = new Date();
+      const nowWeekday = weekdayFromMoscow(now);
+      const nowMin = moscowMinutes(now);
+      const table = document.getElementById("clubs-table");
+      table.innerHTML = "";
+
+      const slots = [
+        { start: "19:00", end: "20:30" },
+        { start: "20:30", end: "21:30" }
+      ];
+      const weekdays = [1, 2, 3, 4, 5];
+
+      const thead = document.createElement("thead");
+      const headRow = document.createElement("tr");
+      const corner = document.createElement("th");
+      corner.className = "week-num";
+      headRow.appendChild(corner);
+
+      for (let i = 0; i < weekdays.length; i += 1) {
+        const day = weekdays[i];
+        const th = document.createElement("th");
+        const label = dayLabel(day);
+        th.textContent = label;
+        if (day === nowWeekday) {
+          th.className = "week-today";
+        }
+        headRow.appendChild(th);
+      }
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      for (let s = 0; s < slots.length; s += 1) {
+        const slot = slots[s];
+        const tr = document.createElement("tr");
+        const numCell = document.createElement("th");
+        numCell.className = "week-num";
+        const time = document.createElement("span");
+        time.className = "week-time";
+        time.textContent = slot.start + "–" + slot.end;
+        numCell.appendChild(time);
+        tr.appendChild(numCell);
+
+        for (let i = 0; i < weekdays.length; i += 1) {
+          const day = weekdays[i];
+          const clubs = clubsForSlot(day, slot.start, slot.end);
+          const td = document.createElement("td");
+          const classes = [];
+          if (day === nowWeekday) {
+            classes.push("week-today");
+          }
+          const current = isCurrentWeekCell("club", day, slot.start, slot.end, nowWeekday, nowMin);
+          if (current && clubs.length > 0) {
+            classes.push("week-now");
+          }
+          if (clubs.length === 0) {
+            classes.push("week-empty");
+            td.textContent = "—";
+          } else {
+            appendClubItems(td, clubs);
+          }
+          td.className = classes.join(" ");
+          tr.appendChild(td);
+        }
+        tbody.appendChild(tr);
+      }
+      table.appendChild(tbody);
+    }
+
+    function refreshClubsTableIfOpen() {
+      const backdrop = document.getElementById("clubs-backdrop");
+      if (!backdrop.classList.contains("open")) {
+        return;
+      }
+      renderClubsTable();
+    }
+
+    function openClubs() {
+      renderClubsTable();
+      openDialog("clubs-backdrop");
+    }
+
+    function closeClubs() {
+      closeDialog("clubs-backdrop");
+    }
+
     document.getElementById("med-open").addEventListener("click", openMed);
     document.getElementById("med-close").addEventListener("click", closeMed);
     document.getElementById("med-backdrop").addEventListener("click", (event) => {
@@ -2057,6 +2246,13 @@
         closeWeek();
       }
     });
+    document.getElementById("clubs-open").addEventListener("click", openClubs);
+    document.getElementById("clubs-close").addEventListener("click", closeClubs);
+    document.getElementById("clubs-backdrop").addEventListener("click", (event) => {
+      if (event.target.id === "clubs-backdrop") {
+        closeClubs();
+      }
+    });
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
         closeMed();
@@ -2064,6 +2260,7 @@
         closeCal();
         closeClass();
         closeWeek();
+        closeClubs();
       }
     });
 
